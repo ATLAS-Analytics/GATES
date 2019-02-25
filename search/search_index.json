@@ -2,23 +2,28 @@
     "docs": [
         {
             "location": "/",
-            "text": "Welcome to GATES\n\n\nFor full documentation visit \nmkdocs.org\n.\n\n\nCommands\n\n\n\n\nmkdocs new [dir-name]\n - Create a new project.\n\n\nmkdocs serve\n - Start the live-reloading docs server.\n\n\nmkdocs build\n - Build the documentation site.\n\n\nmkdocs help\n - Print this help message.\n\n\n\n\nProject layout\n\n\nmkdocs.yml    # The configuration file.\ndocs/\n    index.md  # The documentation homepage.\n    ...       # Other markdown pages, images and other files.",
+            "text": "Welcome to GATES\n\n\nWhat is it?\n\n\nGATES is a service that simplifies running \nAB tests\n. \n\n\nLinks\n\n\n\n\nDocker\n\n\nGitHub\n\n\nDocumentation\n\n\n\n\n\n\nTODO\n\n\n\n\ncert\n\n\nimprove docs\n\n\nget server\n\n\nes templates\n\n\ntests / stress tests",
             "title": "Home"
         },
         {
             "location": "/#welcome-to-gates",
-            "text": "For full documentation visit  mkdocs.org .",
+            "text": "",
             "title": "Welcome to GATES"
         },
         {
-            "location": "/#commands",
-            "text": "mkdocs new [dir-name]  - Create a new project.  mkdocs serve  - Start the live-reloading docs server.  mkdocs build  - Build the documentation site.  mkdocs help  - Print this help message.",
-            "title": "Commands"
+            "location": "/#what-is-it",
+            "text": "GATES is a service that simplifies running  AB tests .",
+            "title": "What is it?"
         },
         {
-            "location": "/#project-layout",
-            "text": "mkdocs.yml    # The configuration file.\ndocs/\n    index.md  # The documentation homepage.\n    ...       # Other markdown pages, images and other files.",
-            "title": "Project layout"
+            "location": "/#links",
+            "text": "Docker  GitHub  Documentation",
+            "title": "Links"
+        },
+        {
+            "location": "/#todo",
+            "text": "cert  improve docs  get server  es templates  tests / stress tests",
+            "title": "TODO"
         }
     ]
 }

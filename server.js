@@ -18,6 +18,7 @@ if (testing) {
     config = require('./kube/config.json');
     privateKey = fs.readFileSync('./kube/secrets/certificates/gates.key.pem');//, 'utf8'
     certificate = fs.readFileSync('./kube/secrets/certificates/gates.cert.cer');
+    config.SITENAME = 'localhost'
 }
 else {
     config = require('/etc/gates/config.json');
@@ -37,7 +38,8 @@ var session = require('express-session');
 // App
 const app = express();
 
-// app.use(express.static(config.STATIC_BASE_PATH));
+app.use(express.static(config.STATIC_BASE_PATH));
+
 app.set('view engine', 'pug');
 app.use(express.json());       // to support JSON-encoded bodies
 app.use(session({
@@ -79,7 +81,13 @@ var client;
 //     response.render("podlog", { pod_name: podname, content: plog.body });
 // });
 
+app.get('/', async function (request, response) {
+    response.render("index")
+})
 
+app.get('/about', async function (request, response) {
+    response.render("about")
+})
 
 app.get('/get_services_from_es/:servicetype', async function (req, res) {
     console.log(req.params);

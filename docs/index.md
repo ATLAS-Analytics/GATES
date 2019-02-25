@@ -16,7 +16,9 @@ GATES is a service that simplifies running [AB tests](https://en.wikipedia.org/w
 ## TODO
 
 * cert
+* define API
 * improve docs
 * get server
 * es templates
 * tests / stress tests
+* analytics

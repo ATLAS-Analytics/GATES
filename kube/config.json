@@ -1,4 +1,5 @@
 {
     "SITENAME": "gates.mwt2.org",
-    "NAMESPACE": "gates"
+    "NAMESPACE": "gates",
+    "STATIC_BASE_PATH": "web"
 }

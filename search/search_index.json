@@ -24,6 +24,41 @@
             "location": "/#todo",
             "text": "cert  improve docs  get server  es templates  tests / stress tests",
             "title": "TODO"
+        },
+        {
+            "location": "/api/",
+            "text": "API",
+            "title": "API"
+        },
+        {
+            "location": "/api/#api",
+            "text": "",
+            "title": "API"
+        },
+        {
+            "location": "/examples/",
+            "text": "Examples\n\n\nShell\n\n\ncurl -....\n\n\nPython\n\n\nC++",
+            "title": "Examples"
+        },
+        {
+            "location": "/examples/#examples",
+            "text": "",
+            "title": "Examples"
+        },
+        {
+            "location": "/examples/#shell",
+            "text": "curl -....",
+            "title": "Shell"
+        },
+        {
+            "location": "/examples/#python",
+            "text": "",
+            "title": "Python"
+        },
+        {
+            "location": "/examples/#c",
+            "text": "",
+            "title": "C++"
         }
     ]
 }

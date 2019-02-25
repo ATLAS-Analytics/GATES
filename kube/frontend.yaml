@@ -1,12 +1,12 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: ml-front
+  name: gates
   namespace: gates
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: www.atlas-ml.org
+    external-dns.alpha.kubernetes.io/hostname: gates.mwt2.org
   labels:
-    k8s-app: ml-front
+    k8s-app: gates
 spec:
   type: LoadBalancer
   ports:
@@ -19,28 +19,28 @@ spec:
     port: 80
     targetPort: 80
   selector:
-    k8s-app: ml-front
+    k8s-app: gates
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ml-front  
+  name: gates  
   namespace: gates
   labels:
-    k8s-app: ml-front
+    k8s-app: gates
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: ml-front
+      k8s-app: gates
   template:
     metadata:
       labels:
-        k8s-app: ml-front
+        k8s-app: gates
     spec:
       containers:
-      - name: ml-front
-        image: sslhep/ml_front:latest
+      - name: gates
+        image: ATLAS-Analytics/GATES:latest
         ports:
           - containerPort: 443
           - containerPort: 80

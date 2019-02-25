@@ -1,0 +1,38 @@
+{
+    "name": "GATES",
+    "version": "1.0.0",
+    "description": "a General Ab Testing Service",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ivukotic/ML_front.git"
+    },
+    "keywords": [
+        "AB",
+        "testing",
+        "service"
+    ],
+    "author": "Ilija Vukotic",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/ATLAS-Analytics/GATES"
+    },
+    "homepage": "https://github.com/ATLAS-Analytics/GATES#readme",
+    "dependencies": {
+        "body-parser": "^1.18.3",
+        "cookies": "^0.7.3",
+        "elasticsearch": "^15.4.1",
+        "express": "^4.16.4",
+        "express-session": "^1.15.6",
+        "fs": "0.0.1-security",
+        "https": "^1.0.0",
+        "npm": "^6.8.0",
+        "pug": "^2.0.3",
+        "request": "^2.88.0",
+        "requests": "^0.2.2",
+        "requires": "^1.0.2"
+    }
+}

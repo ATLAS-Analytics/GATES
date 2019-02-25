@@ -1,0 +1,7 @@
+site_name: GATES
+pages:
+    - Home: index.md
+    - API: api.md
+    - Examples: examples.md
+theme: readthedocs
+repo_url: https://github.com/ATLAS-Analytics/GATES

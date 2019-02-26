@@ -5,7 +5,7 @@ var http = require('http');
 var request = require('request');
 // const JSONStream = require('json-stream'); need for events only
 
-testing = false
+testing = true
 
 console.log('GATES server starting ... ');
 

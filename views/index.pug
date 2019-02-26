@@ -1,10 +1,43 @@
 doctype html
 html
-head
     include ./head.pug
     body
         include ./navigation.pug
-        hr
-        include ./footer.pug
         //- h1 #{pod_name} Pod Log  
         //- p #{content}.
+        header#home.bg-default.text-white
+            .container
+                .row
+                .col-lg-5.mx-auto
+                    h1 ATLAS ML Platform
+                    p.lead
+                    | Get your private ML environment in minutes or use public JupyterLab to learn how others do things.
+                    | The latest versions of the most popular ML software packages are preinstalled.
+                    | If you need something exotic jusk 
+                    a(href='mailto:ivukotic@uchicago.edu') ask
+                    | .
+                    | 						Login using your own institution sign on.
+                    p
+                    | Soon to come: TensorFlow as a service. Environment with OpenAI reinforcement learning framework.
+                    p Hosted on ATLAS MWT2 hardware at University of Chicago.
+                .col-lg-4.mx-auto
+                    img(src='images/cube.png', style='width:40%;')
+
+        hr
+        include ./footer.pug
+        
+        // jQuery
+        script(src='js/jquery.min.js')
+        // jQuery Easing
+        script(src='js/jquery.easing.1.3.js')
+        // Bootstrap
+        script(src='js/bootstrap.min.js')
+        // Waypoints
+        script(src='js/jquery.waypoints.min.js')
+        // Carousel
+        script(src='js/owl.carousel.min.js')
+        // Magnific Popup
+        script(src='js/jquery.magnific-popup.min.js')
+        script(src='js/magnific-popup-options.js')
+        // Main
+        script(src='js/main.js')

@@ -1,0 +1,33 @@
+{
+    "kind": "Pod",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "receiver",
+        "namespace": "xxx",
+        "labels": {
+            "k8s-app": "receiver",
+            "instance": "xxx",
+            "owner": "xxx"
+        }
+    },
+    "spec": {
+        "containers": [
+            {
+                "name": "receiver",
+                "image": "ivukotic/ml_platform_auto:latest",
+                "args": [
+                    "node",
+                    "receiver.js",
+                    "experimentid"
+                ],
+                "ports": [
+                    {
+                        "containerPort": 'xxx'
+                    }
+                ]
+            }
+        ],
+        "restartPolicy": "Always",
+        "serviceAccountName": "xxx"
+    }
+}

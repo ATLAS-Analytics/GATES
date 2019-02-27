@@ -13,22 +13,27 @@ console.log('config load ... ');
 var config;
 var privateKey;
 var certificate;
+var gConfig;
 
 if (testing) {
     config = require('./kube/config.json');
     privateKey = fs.readFileSync('./kube/secrets/certificates/gates.key.pem');//, 'utf8'
     certificate = fs.readFileSync('./kube/secrets/certificates/gates.cert.cer');
     config.SITENAME = 'localhost'
+    gConfig = require('./kube/secrets/globus-config.json');
 }
 else {
     config = require('/etc/gates/config.json');
     privateKey = fs.readFileSync('/etc/https-certs/key.pem');//, 'utf8'
     certificate = fs.readFileSync('/etc/https-certs/cert.pem');
+    gConfig = require('/etc/globus-conf/globus-config.json');
 }
+
+var auth = "Basic " + new Buffer(gConfig.CLIENT_ID + ":" + gConfig.CLIENT_SECRET).toString("base64");
 
 console.log(config);
 
-// const userm = require('./user.js');
+const userm = require('./user.js');
 
 var credentials = { key: privateKey, cert: certificate };
 
@@ -51,22 +56,46 @@ app.use(session({
 // require('./routes/spark')(app);
 // require('./routes/jupyter')(app);
 
-var client;
+// k8s stuff
+const kClient = require('kubernetes-client').Client;
+const kConfig = require('kubernetes-client').config;
+var kclient;
+
+async function configureKube() {
+    try {
+        console.log("configuring k8s client");
+        kclient = new kClient({ config: kConfig.getInCluster() });
+        await kclient.loadSpec();
+        console.log("client configured");
+        return kclient;
+    } catch (err) {
+        console.log("error in configureKube\n", err);
+        process.exit(2);
+    }
+}
+
+async function get_user(id) {
+    var user = new userm();
+    user.id = id;
+    await user.get_user();
+    return user;
+}
+
+const requiresLogin = async (req, res, next) => {
+    // to be used as middleware
+
+    if (req.session.loggedIn !== true) {
+        error = new Error('You must be logged in to view this page.');
+        error.status = 403;
+        return next(error);
+    }
+    return next();
+};
 
 // called on every path
 // app.use(function (req, res, next) {
 //     next();
 // })
-
-
-// async function get_user(id) {
-//     var user = new userm();
-//     user.id = id;
-//     await user.load();
-//     return user;
-// }
-
-
 
 // app.get('/delete/:jservice', requiresLogin, function (request, response) {
 //     var jservice = request.params.jservice;
@@ -83,41 +112,30 @@ var client;
 
 app.get('/', async function (request, response) {
     response.render("index")
-})
+});
 
 app.get('/about', async function (request, response) {
     response.render("about")
-})
-
-app.get('/get_services_from_es/:servicetype', async function (req, res) {
-    console.log(req.params);
-    var servicetype = req.params.servicetype;
-    console.log('user:', req.session.sub_id, 'service:', servicetype);
-    var user = await get_user(req.session.sub_id);
-    var services = await user.get_services(servicetype);
-    console.log(services);
-    res.status(200).send(services);
 });
 
-app.get('/healthz', function (req, res) {
-    // console.log('Checking health.');
+app.get('/healthz', function (request, response) {
     try {
-        res.status(200).send('OK');
+        response.status(200).send('OK');
     } catch (err) {
         console.log("something wrong", err);
     }
 });
 
-// app.get('/plugins', function (req, res) {
-//     // console.log('sending plugins info back.');
-//     res.json({
-//         PRIVATE_JUPYTER: ml_front_config.PRIVATE_JUPYTER,
-//         TFAAS: ml_front_config.TFAAS,
-//         PUBLIC_INSTANCE: ml_front_config.PUBLIC_INSTANCE,
-//         MONITOR: ml_front_config.MONITOR,
-//         SPARK: ml_front_config.SPARK
-//     });
+// app.get('/get_services_from_es/:servicetype', async function (req, res) {
+//     console.log(req.params);
+//     var servicetype = req.params.servicetype;
+//     console.log('user:', req.session.sub_id, 'service:', servicetype);
+//     var user = await get_user(req.session.sub_id);
+//     var services = await user.get_services(servicetype);
+//     console.log(services);
+//     res.status(200).send(services);
 // });
+
 
 
 // app.post('/spark', requiresLogin, sparkCreator, (req, res) => {
@@ -125,103 +143,101 @@ app.get('/healthz', function (req, res) {
 //     res.status(200).send("OK");
 // });
 
-// app.get('/login', (req, res) => {
-//     console.log('Logging in');
-//     red = `${globConf.AUTHORIZE_URI}?scope=urn%3Aglobus%3Aauth%3Ascope%3Aauth.globus.org%3Aview_identities+openid+email+profile&state=garbageString&redirect_uri=${globConf.redirect_link}&response_type=code&client_id=${globConf.CLIENT_ID}`;
-//     // console.log('redirecting to:', red);
-//     res.redirect(red);
-// });
+app.get('/login', (request, response) => {
+    console.log('Logging in');
+    red = `${globConf.AUTHORIZE_URI}?scope=urn%3Aglobus%3Aauth%3Ascope%3Aauth.globus.org%3Aview_identities+openid+email+profile&state=garbageString&redirect_uri=${globConf.redirect_link}&response_type=code&client_id=${globConf.CLIENT_ID}`;
+    // console.log('redirecting to:', red);
+    response.redirect(red);
+});
 
-// app.get('/logout', function (req, res, next) {
+app.get('/logout', function (req, res, next) {
 
-//     if (req.session.loggedIn) {
+    if (req.session.loggedIn) {    // logout from Globus
+        let requestOptions = {
+            uri: `https://auth.globus.org/v2/web/logout?client_id=${globConf.CLIENT_ID}`,
+            headers: {
+                Authorization: `Bearer ${req.session.token}`
+            },
+            json: true
+        };
 
-//         // logout from Globus
-//         let requestOptions = {
-//             uri: `https://auth.globus.org/v2/web/logout?client_id=${globConf.CLIENT_ID}`,
-//             headers: {
-//                 Authorization: `Bearer ${req.session.token}`
-//             },
-//             json: true
-//         };
+        request.get(requestOptions, function (error, response, body) {
+            if (error) {
+                console.log("logout failure...", error);
+            }
+            console.log("globus logout success.\n");
+        });
+    }
+    req.session.destroy();
+    res.render('index');
+});
 
-//         request.get(requestOptions, function (error, response, body) {
-//             if (error) {
-//                 console.log("logout failure...", error);
-//             }
-//             console.log("globus logout success.\n");
-//         });
+app.get('/authcallback', (req, res) => {
+    console.log('AUTH CALLBACK query:', req.query);
+    let code = req.query.code;
+    if (code) {
+        console.log('there is a code. first time around.');
+        code = req.query.code;
+        let state = req.query.state;
+        console.log('AUTH CALLBACK code:', code, '\tstate:', state);
+    }
+    else {
+        console.log('NO CODE call...');
+    }
 
+    red = `${globConf.TOKEN_URI}?grant_type=authorization_code&redirect_uri=${globConf.redirect_link}&code=${code}`;
 
-//     }
-//     req.session.destroy();
+    let requestOptions = {
+        uri: red, method: 'POST', headers: { "Authorization": auth }, json: true
+    };
 
-//     res.redirect('index.html');
+    // console.log(requestOptions);
 
-// });
+    request.post(requestOptions, function (error, response, body) {
+        if (error) {
+            console.log("failure...", err);
+            res.render("index");
+        }
+        console.log("success");//, body);
 
-// app.get('/authcallback', (req, res) => {
-//     console.log('AUTH CALLBACK query:', req.query);
-//     let code = req.query.code;
-//     if (code) {
-//         console.log('there is a code. first time around.');
-//         code = req.query.code;
-//         let state = req.query.state;
-//         console.log('AUTH CALLBACK code:', code, '\tstate:', state);
-//     }
-//     else {
-//         console.log('NO CODE call...');
-//     }
+        console.log('==========================\n getting name.');
+        id_red = `https://auth.globus.org/v2/oauth2/userinfo`;
+        let idrequestOptions = {
+            uri: id_red, method: 'POST', json: true,
+            headers: { "Authorization": `Bearer ${body.access_token}` }
+        };
 
-//     red = `${globConf.TOKEN_URI}?grant_type=authorization_code&redirect_uri=${globConf.redirect_link}&code=${code}`;
+        request.post(idrequestOptions, async function (error, response, body) {
+            if (error) {
+                console.log('error on geting username:\t', error);
+            }
+            console.log('body:\t', body);
+            const user = new userm();
+            user.id = req.session.sub_id = body.sub;
+            user.username = req.session.username = body.preferred_username;
+            user.affiliation = req.session.organization = body.organization;
+            user.name = req.session.name = body.name;
+            user.email = req.session.email = body.email;
+            var found = await user.get_user();
+            if (found === false) {
+                await user.create_user();
+                var body = {
+                    from: config.NAMESPACE + "<" + config.NAMESPACE + "@maniac.uchicago.edu>",
+                    to: user.email,
+                    subject: "GATES membership",
+                    text: "Dear " + user.name + ", \n\n\t" +
+                        " Your have been added to GATES. You may create a new team and run experiments. To be added to an existing team ask one of its members to add you to it (provide your username)." +
+                        "\n\nBest regards,\n\tML front Approval system."
+                }
+                user.send_mail_to_user(body);
+            }
+            req.session.loggedIn = true;
+            res.render("index");
+        });
 
-//     let requestOptions = {
-//         uri: red, method: 'POST', headers: { "Authorization": auth }, json: true
-//     };
+    });
 
-//     // console.log(requestOptions);
-
-//     request.post(requestOptions, function (error, response, body) {
-//         if (error) {
-//             console.log("failure...", err);
-//             res.redirect("index.html");
-//         }
-//         console.log("success");//, body);
-
-//         req.session.loggedIn = true;
-
-//         console.log('==========================\n getting name.');
-//         id_red = `https://auth.globus.org/v2/oauth2/userinfo`;
-//         let idrequestOptions = {
-//             uri: id_red, method: 'POST', json: true,
-//             headers: { "Authorization": `Bearer ${body.access_token}` }
-//         };
-
-//         request.post(idrequestOptions, async function (error, response, body) {
-//             if (error) {
-//                 console.log('error on geting username:\t', error);
-//             }
-//             console.log('body:\t', body);
-//             const user = new userm();
-//             user.id = req.session.sub_id = body.sub;
-//             user.username = req.session.username = body.preferred_username;
-//             user.affiliation = req.session.organization = body.organization;
-//             user.name = req.session.name = body.name;
-//             user.email = req.session.email = body.email;
-//             var found = await user.load();
-//             if (found === false) {
-//                 await user.write();
-//             }
-//             req.session.authorized = user.approved;
-//             if (user.approved === false) {
-//                 user.ask_for_approval();
-//             }
-//             res.redirect("index.html");
-//         });
-
-//     });
-
-// });
+});
 
 // app.get('/authorize/:user_id', async function (req, res) {
 //     console.log('Authorizing user...');
@@ -246,8 +262,8 @@ http.createServer(function (req, res) {
 
 
 async function main() {
-
     try {
+        await configureKube();
     } catch (err) {
         console.error('Error: ', err);
     }

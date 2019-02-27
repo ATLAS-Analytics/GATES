@@ -56,6 +56,10 @@ spec:
         - name: https-certs-volume
           mountPath: "/etc/https-certs/"
           readOnly: true
+        - name: globus-conf-volume
+          mountPath: "/etc/globus-conf/"
+        - name: mg-conf-volume
+          mountPath: "/etc/mg-conf/"
         - name: frontend-conf-volume
           mountPath: "/etc/gates/"
       volumes:
@@ -73,4 +77,17 @@ spec:
           secretName: config
           items:
           - key: conf
+            path: config.json      
+      - name: globus-conf-volume
+        secret:
+          secretName: globus-secret
+          items:
+          - key: gconf
+            path: globus-config.json
+      - name: mg-conf-volume
+        secret:
+          secretName: mg-config
+          items:
+          - key: mgconf
             path: config.json
+      serviceAccountName: gates-fronter

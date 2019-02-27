@@ -29,6 +29,8 @@
         "express-session": "^1.15.6",
         "fs": "0.0.1-security",
         "https": "^1.0.0",
+        "kubernetes-client": "^5.4.0",
+        "mailgun-js": "^0.20.0",
         "npm": "^6.8.0",
         "pug": "^2.0.3",
         "request": "^2.88.0",

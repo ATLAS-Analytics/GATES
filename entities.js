@@ -1,5 +1,6 @@
 
 var elasticsearch = require('elasticsearch');
+var es = new elasticsearch.Client({ host: 'atlas-kibana.mwt2.org:9200', log: 'error' });
 
 testing = true
 var index_name = 'gates' // stores info on users, teams, experiments
@@ -16,35 +17,22 @@ else {
     mg_config = require('/etc/mg-conf/config.json');
 }
 
-module.exports = class User {
-    // functions needed:
-    // create user - automatically added on login if not already there.
-    // get user 
-    // update user 
-    // delete user
-    // create team - user can create a new team
-    // get team 
-    // delete team
-    // update team - add members
-    // create experiment
-    // get experiment
-    // delete experiment
-    // update experiment
+var mg = require('mailgun-js')({ apiKey: mg_config.APPROVAL_MG, domain: mg_config.MG_DOMAIN });
 
+module.exports.User = class User {
 
     constructor() {
-        this.es = new elasticsearch.Client({ host: 'atlas-kibana.mwt2.org:9200', log: 'error' });
-        this.mg = require('mailgun-js')({ apiKey: mg_config.APPROVAL_MG, domain: mg_config.MG_DOMAIN });
         this.created_at = new Date().getTime();
     }
 
-    async create_user() {
+    async create() {
         console.log("adding user to ES...");
         try {
-            const response = await this.es.index({
+            const response = await es.index({
                 index: index_name, type: 'docs', id: this.id,
                 refresh: true,
                 body: {
+                    "kind": "user",
                     "user": this.name,
                     "email": this.email,
                     "username": this.username,
@@ -59,15 +47,16 @@ module.exports = class User {
         console.log("Done.");
     };
 
-    async get_user() {
+    async get() {
         console.log("getting user's info...");
         try {
-            const response = await this.es.search({
+            const response = await es.search({
                 index: index_name, type: 'docs',
                 body: {
                     query: {
                         bool: {
                             must: [
+                                { match: { kind: "user" } },
                                 { match: { _id: this.id } }
                             ]
                         }
@@ -97,10 +86,10 @@ module.exports = class User {
         return false;
     };
 
-    async delete_user() {
+    async delete() {
         console.log("deleting user from ES...");
         try {
-            const response = await this.es.deleteByQuery({
+            const response = await es.deleteByQuery({
                 index: index_name, type: 'docs',
                 body: { query: { match: { "_id": this.id } } }
             });
@@ -111,10 +100,10 @@ module.exports = class User {
         console.log("Done.");
     };
 
-    async update_user() {
+    async update() {
         console.log("Updating user info in ES...");
         try {
-            const response = await this.es.update({
+            const response = await es.update({
                 index: index_name, type: 'docs', id: this.id,
                 body: {
                     doc: {
@@ -129,8 +118,6 @@ module.exports = class User {
         }
         console.log("Done.");
     };
-
-
 
     // async approve() {
     //     this.approved = true;
@@ -148,7 +135,7 @@ module.exports = class User {
     // };
 
     async send_mail_to_user(data) {
-        this.mg.messages().send(data, function (error, body) {
+        mg.messages().send(data, function (error, body) {
             console.log(body);
         });
     };
@@ -160,7 +147,7 @@ module.exports = class User {
             service.timestamp = new Date().getTime();
             service.user = this.name;
             console.log('creating service in es: ', service);
-            await this.es.index({
+            await es.index({
                 index: index_name, type: 'docs', body: service
             }, function (err, resp, status) {
                 console.log("from ES indexer:", resp);
@@ -174,7 +161,7 @@ module.exports = class User {
         console.log('terminating service in ES: ', name, 'owned by', this.id);
         console.log('not implemented yet.');
         // try {
-        //     const response = await this.es.update({
+        //     const response = await es.update({
         //         index: 'ml_front', type: 'docs', id: this.id,
         //         body: {
         //             doc: {
@@ -193,7 +180,7 @@ module.exports = class User {
     async get_services(servicetype) {
         console.log('getting all services >', servicetype, '< of this user...');
         try {
-            const resp = await this.es.search({
+            const resp = await es.search({
                 index: "ml_front", type: "docs",
                 body: {
                     query: { match: { "owner": this.id } },
@@ -241,7 +228,7 @@ module.exports = class User {
 
     //     console.log('getting all users info from es.');
     //     try {
-    //         const resp = await this.es.search({
+    //         const resp = await es.search({
     //             index: 'mlfront_users', type: 'docs',
     //             body: {
     //                 size: 1000,
@@ -273,3 +260,222 @@ module.exports = class User {
 
 
 
+module.exports.Team = class Team {
+    // functions needed:
+    // create team - user can create a new team
+    // get team 
+    // delete team
+    // update team - add members, change descriptions, change name
+
+    constructor(id = null) {
+        this.name = 'Default team name';
+        this.description = 'Default description';
+        this.members = [];
+        this.created_at = new Date().getTime();
+        if (id) {
+            this.get(id);
+        }
+    }
+
+    async create(user_id) {
+        console.log("adding team to ES...");
+        this.members = [user_id];
+        try {
+            const response = await es.index({
+                index: index_name, type: 'docs',
+                refresh: true,
+                body: {
+                    "kind": "team",
+                    "name": this.name,
+                    "description": this.description,
+                    "members": this.members,
+                    "created_at": new Date().getTime()
+                }
+            });
+            console.log(response);
+        } catch (err) {
+            console.error(err)
+        }
+        console.log("Done.");
+    };
+
+    async get(id) {
+        console.log("getting team's info...");
+        try {
+            const response = await es.search({
+                index: index_name, type: 'docs',
+                body: {
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { kind: "team" } },
+                                { match: { _id: id } }
+                            ]
+                        }
+                    }
+                }
+            });
+            // console.log(response);
+            if (response.hits.total == 0) {
+                console.log("team not found.");
+                return false;
+            }
+            else {
+                console.log("team found.");
+                var obj = response.hits.hits[0]._source;
+                // console.log(obj);
+                this.id = obj._id;
+                this.name = obj.name;
+                this.description = obj.description;
+                this.members = obj.members;
+                this.created_at = obj.created_at;
+                return true;
+            };
+        } catch (err) {
+            console.error(err)
+        }
+        console.log('Done.');
+        return false;
+    };
+
+    async delete() {
+        console.log("deleting team from ES...");
+        try {
+            const response = await es.deleteByQuery({
+                index: index_name, type: 'docs',
+                body: { query: { match: { "_id": this.id } } }
+            });
+            console.log(response);
+        } catch (err) {
+            console.error(err)
+        }
+        console.log("Done.");
+    };
+
+    async update() {
+        console.log("Updating team info in ES...");
+        try {
+            const response = await es.update({
+                index: index_name, type: 'docs', id: this.id,
+                body: {
+                    doc: {
+                        "name": this.name,
+                        "description": this.description,
+                        "members": this.members
+                    }
+                }
+            });
+            console.log(response);
+        } catch (err) {
+            console.error(err)
+        }
+        console.log("Done.");
+    };
+}
+
+module.exports.Experiment = class Experiment {
+    // functions needed:
+    // create experiment
+    // get experiment
+    // delete experiment
+    // update experiment
+
+    constructor(id = null) {
+        this.created_at = new Date().getTime();
+        if (id) {
+            this.get(id);
+        }
+    }
+
+    async create(team_id) {
+        console.log("adding experiment to ES...");
+        try {
+            const response = await es.index({
+                index: index_name, type: 'docs',
+                refresh: true,
+                body: {
+                    "kind": "experiment",
+                    "name": this.name,
+                    "description": this.description,
+                    "team": team_id,
+                    "created_at": new Date().getTime()
+                }
+            });
+            console.log(response);
+        } catch (err) {
+            console.error(err)
+        }
+        console.log("Done.");
+    };
+
+    async get(id) {
+        console.log("getting experiment's info...");
+        try {
+            const response = await es.search({
+                index: index_name, type: 'docs',
+                body: {
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { _id: id } }
+                            ]
+                        }
+                    }
+                }
+            });
+            // console.log(response);
+            if (response.hits.total == 0) {
+                console.log("experiment not found.");
+                return false;
+            }
+            else {
+                console.log("experiment found.");
+                var obj = response.hits.hits[0]._source;
+                // console.log(obj);
+                this.id = obj._id;
+                this.name = obj.name;
+                this.description = obj.description;
+                this.team = obj.team;
+                this.created_at = obj.created_at;
+                return true;
+            };
+        } catch (err) {
+            console.error(err)
+        }
+        console.log('Done.');
+        return false;
+    };
+
+    async delete() {
+        console.log("deleting experiment from ES...");
+        try {
+            const response = await es.deleteByQuery({
+                index: index_name, type: 'docs',
+                body: { query: { match: { "_id": this.id } } }
+            });
+            console.log(response);
+        } catch (err) {
+            console.error(err)
+        }
+        console.log("Done.");
+    };
+
+    async update() {
+        console.log("Updating experiment info in ES...");
+        try {
+            const response = await es.update({
+                index: index_name, type: 'docs', id: this.id,
+                body: {
+                    doc: {
+                        "name": this.name,
+                        "description": this.description
+                    }
+                }
+            });
+            console.log(response);
+        } catch (err) {
+            console.error(err)
+        }
+        console.log("Done.");
+    };
+}

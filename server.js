@@ -33,7 +33,7 @@ var auth = "Basic " + new Buffer(gConfig.CLIENT_ID + ":" + gConfig.CLIENT_SECRET
 
 console.log(config);
 
-const userm = require('./user.js');
+const ent = require('./entities.js');
 
 var credentials = { key: privateKey, cert: certificate };
 
@@ -75,9 +75,9 @@ async function configureKube() {
 }
 
 async function get_user(id) {
-    var user = new userm();
+    var user = new ent.User();
     user.id = id;
-    await user.get_user();
+    await user.get();
     return user;
 }
 
@@ -212,15 +212,15 @@ app.get('/authcallback', (req, res) => {
                 console.log('error on geting username:\t', error);
             }
             console.log('body:\t', body);
-            const user = new userm();
+            const user = new ent.User();
             user.id = req.session.sub_id = body.sub;
             user.username = req.session.username = body.preferred_username;
             user.affiliation = req.session.organization = body.organization;
             user.name = req.session.name = body.name;
             user.email = req.session.email = body.email;
-            var found = await user.get_user();
+            var found = await user.get();
             if (found === false) {
-                await user.create_user();
+                await user.create();
                 var body = {
                     from: config.NAMESPACE + "<" + config.NAMESPACE + "@maniac.uchicago.edu>",
                     to: user.email,
@@ -237,6 +237,24 @@ app.get('/authcallback', (req, res) => {
 
     });
 
+});
+
+app.get('/test', async function (req, res) {
+    console.log('TEST starting...');
+    console.log('User...');
+    // create user
+    u = new ent.User();
+    u.name = "test user";
+    u.organization = "test organization";
+    u.username = "testUser";
+    u.email = "testUser@test.organization.org";
+    u.create();
+
+    t = new ent.Team();
+    t.name = "test team";
+    t.desription = "test description";
+    t.create();
+    res.render("index");
 });
 
 // app.get('/authorize/:user_id', async function (req, res) {

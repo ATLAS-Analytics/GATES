@@ -145,7 +145,7 @@ app.get('/healthz', function (request, response) {
 
 app.get('/login', (request, response) => {
     console.log('Logging in');
-    red = `${globConf.AUTHORIZE_URI}?scope=urn%3Aglobus%3Aauth%3Ascope%3Aauth.globus.org%3Aview_identities+openid+email+profile&state=garbageString&redirect_uri=${globConf.redirect_link}&response_type=code&client_id=${globConf.CLIENT_ID}`;
+    red = `${gConfig.AUTHORIZE_URI}?scope=urn%3Aglobus%3Aauth%3Ascope%3Aauth.globus.org%3Aview_identities+openid+email+profile&state=garbageString&redirect_uri=${gConfig.redirect_link}&response_type=code&client_id=${gConfig.CLIENT_ID}`;
     // console.log('redirecting to:', red);
     response.redirect(red);
 });
@@ -154,7 +154,7 @@ app.get('/logout', function (req, res, next) {
 
     if (req.session.loggedIn) {    // logout from Globus
         let requestOptions = {
-            uri: `https://auth.globus.org/v2/web/logout?client_id=${globConf.CLIENT_ID}`,
+            uri: `https://auth.globus.org/v2/web/logout?client_id=${gConfig.CLIENT_ID}`,
             headers: {
                 Authorization: `Bearer ${req.session.token}`
             },
@@ -185,7 +185,7 @@ app.get('/authcallback', (req, res) => {
         console.log('NO CODE call...');
     }
 
-    red = `${globConf.TOKEN_URI}?grant_type=authorization_code&redirect_uri=${globConf.redirect_link}&code=${code}`;
+    red = `${gConfig.TOKEN_URI}?grant_type=authorization_code&redirect_uri=${gConfig.redirect_link}&code=${code}`;
 
     let requestOptions = {
         uri: red, method: 'POST', headers: { "Authorization": auth }, json: true
@@ -263,7 +263,9 @@ http.createServer(function (req, res) {
 
 async function main() {
     try {
-        await configureKube();
+        if (!testing) {
+            await configureKube();
+        }
     } catch (err) {
         console.error('Error: ', err);
     }

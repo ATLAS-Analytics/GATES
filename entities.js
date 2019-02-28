@@ -13,7 +13,7 @@ if (testing) {
     mg_config = require('./kube/secrets/mg-config.json');
 }
 else {
-    config = require('/etc/ml-front-conf/config.json');
+    config = require('/etc/gates/config.json');
     mg_config = require('/etc/mg-conf/config.json');
 }
 

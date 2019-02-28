@@ -1,0 +1,2 @@
+curl -XPOST  -H 'Content-Type: application/json' 'http://atlas-kibana.mwt2.org:9200/_template/gates' -d @meta.json
+curl -XPOST  -H 'Content-Type: application/json' 'http://atlas-kibana.mwt2.org:9200/_template/gates_results' -d @results.json

@@ -1,0 +1,36 @@
+{
+    "index_patterns": "gates_results",
+    "settings": {
+        "index": {
+            "number_of_shards": "10",
+            "number_of_replicas": "0"
+        }
+    },
+    "mappings": {
+        "docs": {
+            "properties": {
+                "experiment_id": {
+                    "type": "keyword"
+                },
+                "timestamp": {
+                    "type": "date"
+                },
+                "choice": {
+                    "type": "keyword"
+                },
+                "result_float": {
+                    "type": "float"
+                },
+                "result_int": {
+                    "type": "integer"
+                },
+                "result_bool": {
+                    "type": "boolean"
+                },
+                "result": {
+                    "type": "keyword"
+                }
+            }
+        }
+    }
+}

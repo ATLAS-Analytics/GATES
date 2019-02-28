@@ -374,14 +374,12 @@ module.exports.Team = class Team {
 }
 
 module.exports.Experiment = class Experiment {
-    // functions needed:
-    // create experiment
-    // get experiment
-    // delete experiment
-    // update experiment
+
+    // statuses: stopped, running, paused, retired
 
     constructor(id = null) {
         this.created_at = new Date().getTime();
+        this.status = 'stopped'
         if (id) {
             this.get(id);
         }
@@ -398,6 +396,7 @@ module.exports.Experiment = class Experiment {
                     "name": this.name,
                     "description": this.description,
                     "team": team_id,
+                    "status": this.status,
                     "created_at": new Date().getTime()
                 }
             });
@@ -436,6 +435,7 @@ module.exports.Experiment = class Experiment {
                 this.name = obj.name;
                 this.description = obj.description;
                 this.team = obj.team;
+                this.status = obj.status;
                 this.created_at = obj.created_at;
                 return true;
             };
@@ -468,7 +468,8 @@ module.exports.Experiment = class Experiment {
                 body: {
                     doc: {
                         "name": this.name,
-                        "description": this.description
+                        "description": this.description,
+                        "status": this.status
                     }
                 }
             });

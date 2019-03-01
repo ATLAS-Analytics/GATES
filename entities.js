@@ -29,7 +29,7 @@ module.exports.User = class User {
         console.log("adding user to ES...");
         try {
             const response = await es.index({
-                index: index_name, type: 'docs', id: this.id,
+                index: index_name, type: 'docs',
                 refresh: true,
                 body: {
                     "kind": "user",

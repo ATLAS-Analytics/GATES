@@ -52,9 +52,7 @@ app.use(session({
     saveUninitialized: true, cookie: { secure: false, maxAge: 3600000 }
 }));
 
-// require('./routes/user')(app);
-// require('./routes/spark')(app);
-// require('./routes/jupyter')(app);
+require('./routes/user')(app);
 
 // k8s stuff
 const kClient = require('kubernetes-client').Client;
@@ -227,7 +225,7 @@ app.get('/authcallback', (req, res) => {
                     subject: "GATES membership",
                     text: "Dear " + user.name + ", \n\n\t" +
                         " Your have been added to GATES. You may create a new team and run experiments. To be added to an existing team ask one of its members to add you to it (provide your username)." +
-                        "\n\nBest regards,\n\tML front Approval system."
+                        "\n\nBest regards,\n\tGATES mailing system."
                 }
                 user.send_mail_to_user(body);
             }

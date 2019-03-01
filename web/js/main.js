@@ -329,21 +329,10 @@
 	var loadHeaderFooter = function () {
 		// $("#ilija_footer").load("footer.html");
 		// $("#ilija_navigation").load("navigation.html", function () {
-		// swapLoginLogout(); selectPlugins(); 
+		swapLoginLogout();
 		dropdown();
 		// });
 
-	};
-
-	var selectPlugins = function () {
-		$.get("/plugins", function (data) {
-			for (const key of Object.keys(data)) {
-				console.log(key, data[key]);
-				if (data[key] == false) {
-					$('#plugin_' + key).hide();
-				}
-			}
-		});
 	};
 
 	var swapLoginLogout = function () {

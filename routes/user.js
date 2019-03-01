@@ -13,6 +13,10 @@ module.exports = function (app) {
         });
     });
 
+    app.get('/profile', function (req, res) {
+        res.render("profile", { yourname: req.session.name, youremail: req.session.email, yourorganization: req.session.organization });
+    });
+
     // app.get('/users_data', async function (req, res) {
     //     console.log('Sending all users info...');
     //     const user = new userm();

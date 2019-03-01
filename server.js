@@ -53,6 +53,8 @@ app.use(session({
 }));
 
 require('./routes/user')(app);
+require('./routes/team')(app);
+require('./routes/experiment')(app);
 
 // k8s stuff
 const kClient = require('kubernetes-client').Client;

@@ -14,8 +14,9 @@ GATES is a service that simplifies running [AB tests](https://en.wikipedia.org/w
 
 ## TODO
 
-* add back globus auth, fix secret (clientid and clientsecret)
-* add Mailgun secret and change CNET things.
+* get auth link not to show.
+* profile link - with form and editing
+* get dropdowns not to open automatically.
 * make teams, experiments & teams hidden for non-logged users.
 * remove approval things. who creates a team, asks coleagues to sign up, then add them to team by username
 * add back kubernetes-client

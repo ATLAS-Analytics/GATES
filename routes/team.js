@@ -1,6 +1,6 @@
 module.exports = function (app) {
 
-    app.get('/user', function (req, res) {
+    app.get('/team', function (req, res) {
         console.log('sending profile info back.');
 
         res.json({

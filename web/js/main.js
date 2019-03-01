@@ -319,37 +319,8 @@
 
 	};
 
-
-	// Loading page
 	var loaderPage = function () {
 		$(".gtco-loader").fadeOut("slow");
-	};
-
-	// Loading page
-	var loadHeaderFooter = function () {
-		// $("#ilija_footer").load("footer.html");
-		// $("#ilija_navigation").load("navigation.html", function () {
-		swapLoginLogout();
-		dropdown();
-		// });
-
-	};
-
-	var swapLoginLogout = function () {
-		$.get("/user", function (data) {
-			console.log(data);
-			if (data.name) {
-				console.log('hiding login button');
-				$('#login_button').hide();
-				$('#profile_button').show();
-				$('.requires_login').show();
-			} else {
-				console.log('hiding profile button');
-				$('#profile_button').hide();
-				$('#login_button').show();
-				$('.requires_login').hide();
-			}
-		});
 	};
 
 	var counter = function () {
@@ -372,6 +343,23 @@
 		}
 	};
 
+	var swapLoginLogout = function () {
+		$.get("/user", function (data) {
+			console.log(data);
+			if (data.name) {
+				console.log('hiding login button');
+				$('#login_button').hide();
+				$('#profile_button').show();
+				$('.requires_login').show();
+			} else {
+				console.log('hiding profile button');
+				$('#profile_button').hide();
+				$('#login_button').show();
+				$('.requires_login').hide();
+			}
+		});
+	};
+
 	$(function () {
 		mobileMenuOutsideClick();
 		offcanvasMenu();
@@ -382,9 +370,12 @@
 		tabs();
 		goToTop();
 		loaderPage();
-		loadHeaderFooter();
 		counterWayPoint();
 		changeWayPoint();
+
+
+		dropdown();
+		swapLoginLogout();
 	});
 
 

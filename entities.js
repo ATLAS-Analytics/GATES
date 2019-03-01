@@ -2,7 +2,7 @@
 var elasticsearch = require('elasticsearch');
 var es = new elasticsearch.Client({ host: 'atlas-kibana.mwt2.org:9200', log: 'error' });
 
-testing = false
+testing = true
 var index_name = 'gates' // stores info on users, teams, experiments
 
 var config;

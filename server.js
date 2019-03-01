@@ -5,7 +5,7 @@ var http = require('http');
 var request = require('request');
 // const JSONStream = require('json-stream'); need for events only
 
-testing = false
+testing = true
 
 console.log('GATES server starting ... ');
 
@@ -232,11 +232,18 @@ app.get('/authcallback', (req, res) => {
                 user.send_mail_to_user(body);
             }
             req.session.loggedIn = true;
-            res.render("index");
+            res.redirect("/");
         });
 
     });
 
+});
+
+app.get('/reg', async function (req, res) {
+    req.session.loggedIn = true;
+    req.session.name = "Ilija";
+    req.session.email = "Ilija@asdf";
+    res.render("index");
 });
 
 app.get('/test', async function (req, res) {

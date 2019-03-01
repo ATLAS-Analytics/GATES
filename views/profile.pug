@@ -5,26 +5,26 @@ html
         include ./navigation.pug
 
         section#gtco-header.gtco-cover.gtco-cover-xs.gtco-inner(style='background-color: rgba(52, 58, 64, 0.4)')
-  .gtco-container.container
-    .row
-      .col-lg-5.mx-auto
-        p.lead
-          img(src='images/cube.png')
-      .col-lg-4.mx-auto
-        .card(style='width: 18rem;')
-          .card-body
-            h4.card-title Profile Information
-            div
-              | Name:
-              p#yourname.card-text #{yourname}
-            div
-              | Email:
-              p#youremail.card-text #{youremail}
-            div
-              | Organization:
-              p#yourorganization.card-text #{yourorganization}
-            hr
-            button#logout_button.btn.btn-primary Logout
+            .gtco-container.container
+                .row
+                .col-lg-5.mx-auto
+                    p.lead
+                    img(src='images/cube.png')
+                .col-lg-4.mx-auto
+                    .card(style='width: 18rem;')
+                    .card-body
+                        h4.card-title Profile Information
+                        div
+                        | Name:
+                        p#yourname.card-text #{yourname}
+                        div
+                        | Email:
+                        p#youremail.card-text #{youremail}
+                        div
+                        | Organization:
+                        p#yourorganization.card-text #{yourorganization}
+                        hr
+                        button#logout_button.btn.btn-primary Logout
 
         hr
         include ./footer.pug

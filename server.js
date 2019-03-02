@@ -40,9 +40,7 @@ var credentials = { key: privateKey, cert: certificate };
 var elasticsearch = require('elasticsearch');
 var session = require('express-session');
 
-// App
 const app = express();
-
 app.use(express.static(config.STATIC_BASE_PATH));
 
 app.set('view engine', 'pug');
@@ -270,6 +268,7 @@ app.get('/test', async function (req, res) {
 //     user.approve();
 //     res.redirect("/users.html");
 // });
+
 
 app.use((err, req, res, next) => {
     console.error('Error in error handler: ', err.message);

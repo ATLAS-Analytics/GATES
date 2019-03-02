@@ -21,6 +21,7 @@ module.exports = function (app) {
 
     app.get('/team/:teamid', function (req, res) {
         var teamid = req.params.teamid;
+        console.log("getting team ", teamid);
         var team;
         if (teamid === 'new') {
             team = new ent.Team();
@@ -29,6 +30,7 @@ module.exports = function (app) {
         }
         res.render("team", { name: team.name, description: team.description, members: team.members });
     });
+
 
     // app.get('/users_data', async function (req, res) {
     //     console.log('Sending all users info...');

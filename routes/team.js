@@ -31,6 +31,18 @@ module.exports = function (app) {
         res.render("team", { name: team.name, description: team.description, members: team.members });
     });
 
+    app.post('/team_update', function (req, res) {
+        var teamid = req.params.teamid;
+        console.log("updating team", teamid);
+        var team;
+        if (teamid === 'new') {
+            team = new ent.Team();
+        } else {
+            team = new ent.Team(teamid);
+        }
+        team.update();
+        // res.render("team", { name: team.name, description: team.description, members: team.members });
+    });
 
     // app.get('/users_data', async function (req, res) {
     //     console.log('Sending all users info...');

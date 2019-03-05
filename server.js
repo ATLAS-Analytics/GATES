@@ -5,7 +5,7 @@ var http = require('http');
 var request = require('request');
 // const JSONStream = require('json-stream'); need for events only
 
-testing = false
+testing = false;
 
 console.log('GATES server starting ... ');
 
@@ -127,8 +127,8 @@ app.get('/healthz', function (request, response) {
 // app.get('/get_services_from_es/:servicetype', async function (req, res) {
 //     console.log(req.params);
 //     var servicetype = req.params.servicetype;
-//     console.log('user:', req.session.sub_id, 'service:', servicetype);
-//     var user = await get_user(req.session.sub_id);
+//     console.log('user:', req.session.user_id, 'service:', servicetype);
+//     var user = await get_user(req.session.user_id);
 //     var services = await user.get_services(servicetype);
 //     console.log(services);
 //     res.status(200).send(services);
@@ -211,7 +211,7 @@ app.get('/authcallback', (req, res) => {
             }
             console.log('body:\t', body);
             const user = new ent.User();
-            user.id = req.session.sub_id = body.sub;
+            user.id = req.session.user_id = body.sub;
             user.username = req.session.username = body.preferred_username;
             user.affiliation = req.session.organization = body.organization;
             user.name = req.session.name = body.name;
@@ -228,8 +228,12 @@ app.get('/authcallback', (req, res) => {
                         "\n\nBest regards,\n\tGATES mailing system."
                 }
                 user.send_mail_to_user(body);
+                await user.get(); // so user.id gets filled up
             }
             req.session.loggedIn = true;
+            req.session.teams = user.get_teams();
+            req.session.selected_team = null;
+            req.session.selected_experiment = null;
             res.redirect("/");
         });
 
@@ -240,8 +244,13 @@ app.get('/authcallback', (req, res) => {
 app.get('/reg', async function (req, res) {
     req.session.loggedIn = true;
     req.session.name = "Ilija";
+    req.session.username = "ilijav";
     req.session.email = "Ilija@asdf";
-    res.render("index");
+    req.session.affiliation = "University of Chicago";
+    req.session.teams = ['abc', 'ADC', 'loosers']
+    req.session.selected_team = 'ADC';
+    await
+        res.render("index");
 });
 
 app.get('/test', async function (req, res) {

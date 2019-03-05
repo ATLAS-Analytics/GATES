@@ -14,9 +14,12 @@ GATES is a service that simplifies running [AB tests](https://en.wikipedia.org/w
 
 ## TODO
 
-* profile link - with form and editing
-* get dropdowns not to open automatically.
-* remove approval things. who creates a team, asks coleagues to sign up, then add them to team by username
+* set pug basedir. refer to pug includes with apsolute paths.
+* download/update easing, waypoints. Is magnificent pop up needed? 
+* Don't call /user on every index render. should simply check session? 
+* load user's teams upon login.
+* add a checkmark when a team selected, load experiments.
+* check logout works
 * define API
 * improve docs
 * get server

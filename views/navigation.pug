@@ -5,28 +5,38 @@ nav#mainNav.navbar.navbar-expand-lg.fixed-top(style='background-image: linear-gr
       |  ГАТЕС
     #navbarResponsive.collapse.navbar-collapse
       ul.navbar-nav.ml-auto
+        
         li.nav-item
           a.nav-link(href='/about') About
+        
         li.nav-item
           a.nav-link(href='https://atlas-analytics.github.io/GATES/') Docs
+        
         li.nav-item.dropdown.requires_login(style='display:none;')
           a#navbarDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
             | Teams
           .dropdown-menu(aria-labelledby='navbarDropdown')
+            each val, index in {"team_id_1":'one','team_id_2':'team_2','team_id_3':'three'}
+              a#plugin_projects.dropdown-item(href=index +":"+ val) #{val}
             .dropdown-divider
             a#plugin_projects.dropdown-item(href='/team/new') New team
+        
         li.nav-item.dropdown.requires_login(style='display:none;')
           a#navbarDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
             | Experiments
           .dropdown-menu(aria-labelledby='navbarDropdown')
             .dropdown-divider
-            a#plugin_projects.dropdown-item( href='/experiment/new') New experiment
+            a#plugin_experiments.dropdown-item( href='/experiment/new') New experiment
+        
         li.nav-item.requires_login(style='display:none;')
           a.nav-link(href='/analytics') Analytics
+        
         li.nav-item
           a.nav-link(href='https://atlas-kibana.mwt2.org/s/gates/', target='_blank') Monitor
+        
         li#login_button.nav-item
           a.nav-link(href='/login') Login
+        
         li#profile_button.nav-item(style='display:none;')
           a.nav-link(href='/profile') Profile
 

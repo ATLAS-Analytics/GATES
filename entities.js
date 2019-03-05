@@ -2,7 +2,7 @@
 var elasticsearch = require('elasticsearch');
 var es = new elasticsearch.Client({ host: 'atlas-kibana.mwt2.org:9200', log: 'error' });
 
-testing = false
+testing = false;
 var index_name = 'gates' // stores info on users, teams, experiments
 
 var config;
@@ -119,6 +119,41 @@ module.exports.User = class User {
         console.log("Done.");
     };
 
+    async get_teams() {
+        console.log('getting all teams of user...', this.username);
+        try {
+            const resp = await es.search({
+                index: index_name, type: "docs",
+                body: {
+                    query: {
+                        bool: {
+                            must: [
+                                { match: { "kind": "team" } },
+                                { match: { "members": this.id } },
+                            ]
+                        }
+                    },
+                    sort: { "timestamp": { order: "desc" } }
+                }
+            });
+            // console.log(resp);
+            var res = [];
+            if (resp.hits.total > 0) {
+                // console.log(resp.hits.hits);
+                for (var i = 0; i < resp.hits.hits.length; i++) {
+                    var obj = resp.hits.hits[i]._source;
+                    console.log(obj);
+                    res.push(obj.name);
+                }
+            } else {
+                console.log("no teams found.");
+            }
+            return res;
+        } catch (err) {
+            console.error(err)
+        }
+        return [];
+    };
     // async approve() {
     //     this.approved = true;
     //     this.approved_on = new Date().getTime();

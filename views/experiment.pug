@@ -16,41 +16,24 @@ html
                         h4.card-title Profile Information
                         div
                         | Name:
-                        p#yourname.card-text #{yourname}
+                        p#name.card-text #{name}
                         div
                         | Email:
-                        p#youremail.card-text #{youremail}
+                        p#email.card-text #{email}
                         div
                         | Organization:
-                        p#yourorganization.card-text #{yourorganization}
+                        p#affiliation.card-text #{affiliation}
                         hr
                         button#logout_button.btn.btn-primary Logout
 
         hr
         include ./footer.pug
-        //- h1 #{pod_name} Pod Log  
-        //- p #{content}.
 
-
-        // jQuery
-        script(src='js/jquery.min.js')
-        // jQuery Easing
-        script(src='js/jquery.easing.1.3.js')
-        // Bootstrap
-        script(src='js/bootstrap.min.js')
-        // Waypoints
-        script(src='js/jquery.waypoints.min.js')
-        // Carousel
-        script(src='js/owl.carousel.min.js')
-        // Magnific Popup
-        script(src='js/jquery.magnific-popup.min.js')
-        script(src='js/magnific-popup-options.js')
-        // Main
         script(src='js/main.js')
 
         //- script(type='text/javascript', language='JavaScript').
         //-     $.get("/user", function (data) {
-        //-         $('#yourname').text(data.name);
-        //-         $('#youremail').text(data.email);
-        //-         $('#yourorganization').text(data.organization);
+        //-         $('#name').text(data.name);
+        //-         $('#email').text(data.email);
+        //-         $('#affiliation').text(data.organization);
         //-     });

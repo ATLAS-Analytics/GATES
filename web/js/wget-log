@@ -1,0 +1,5 @@
+Will not apply HSTS. The HSTS database must be a regular and non-world-writable file.
+ERROR: could not open HSTS store at '/home/ivukotic/.wget-hsts'. HSTS will be disabled.
+--2019-03-05 16:17:15--  https://code.jquery.com/jquery-3.3.1.min.jsexit
+Resolving code.jquery.com (code.jquery.com)... failed: Temporary failure in name resolution.
+wget: unable to resolve host address ‘code.jquery.com’

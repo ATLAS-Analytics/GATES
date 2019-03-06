@@ -17,24 +17,23 @@ html
                     .col-lg-6.mx-auto
                         h2 Create/Edit your Team
                         form#team_update(action='#')
-                        .form-group
-                            label(for='name') Name *
-                            input#name.form-control(type='text',required='',value=name)
-                            p#name_valid
-                        .form-group
-                            label(for='description') Description * 
-                            input#description.form-control(type='text',required='',value=description)
-                            p#description_valid
-                        .form-group
-                            label(for='members') Members * 
-                            input#members.form-control(type='text',required='',value=members)
-                            p#members_valid
-                        .form-group
-                            label(for='teamurl') Team web page/github repo.
-                            input#teamurl.form-control(type='text', value=teamurl)
-                        .form-group
-                            input.btn.btn.btn-primary(type='submit', value='CREATE / SAVE')
-
+                            .form-group
+                                label(for='name') Name *
+                                input#name.form-control(type='text',required='',value=name)
+                                p#name_valid
+                            .form-group
+                                label(for='description') Description * 
+                                input#description.form-control(type='text',required='',value=description)
+                                p#description_valid
+                            .form-group
+                                label(for='members') Members * 
+                                input#members.form-control(type='text',required='',value=members)
+                                p#members_valid
+                            .form-group
+                                label(for='teamurl') Team web page/github repo.
+                                input#teamurl.form-control(type='text', value=teamurl)
+                            .form-group
+                                input.btn.btn.btn-primary(type='submit', value='CREATE / SAVE')
 
         hr
         include ./footer.pug

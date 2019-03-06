@@ -133,7 +133,7 @@ module.exports.User = class User {
                             ]
                         }
                     },
-                    sort: { "timestamp": { order: "desc" } }
+                    sort: { "created_at": { order: "desc" } }
                 }
             });
             // console.log(resp);

@@ -2,10 +2,15 @@ $(document).ready(function () {
 
     // called from profile.pug, team.pug
 
-    var logout_handler = function () {
+    var user_handlers = function () {
         $("#logout_button").click(function () {
             $.get("/logout");
-            window.location.replace("index.html");
+            window.location.replace("/");
+        });
+
+        $("#user_delete_button").click(function () {
+            $.get("/user/delete");
+            window.location.replace("/");
         });
     }
 
@@ -78,7 +83,7 @@ $(document).ready(function () {
         )
     };
 
-    logout_handler();
+    user_handlers();
     team_handler();
 
 });

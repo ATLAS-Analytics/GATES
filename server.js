@@ -5,7 +5,7 @@ var http = require('http');
 var request = require('request');
 // const JSONStream = require('json-stream'); need for events only
 
-testing = false;
+testing = true;
 
 console.log('GATES server starting ... ');
 
@@ -17,6 +17,7 @@ var gConfig;
 
 if (testing) {
     config = require('./kube/config.json');
+    config.TESTING = testing
     privateKey = fs.readFileSync('./kube/secrets/certificates/gates.key.pem');//, 'utf8'
     certificate = fs.readFileSync('./kube/secrets/certificates/gates.cert.cer');
     config.SITENAME = 'localhost'
@@ -24,6 +25,7 @@ if (testing) {
 }
 else {
     config = require('/etc/gates/config.json');
+    config.TESTING = testing
     privateKey = fs.readFileSync('/etc/https-certs/key.pem');//, 'utf8'
     certificate = fs.readFileSync('/etc/https-certs/cert.pem');
     gConfig = require('/etc/globus-conf/globus-config.json');
@@ -40,6 +42,8 @@ var credentials = { key: privateKey, cert: certificate };
 var elasticsearch = require('elasticsearch');
 var session = require('express-session');
 
+var cookie = require('cookie');
+
 const app = express();
 app.use(express.static(config.STATIC_BASE_PATH));
 
@@ -50,9 +54,9 @@ app.use(session({
     saveUninitialized: true, cookie: { secure: false, maxAge: 3600000 }
 }));
 
-require('./routes/user')(app);
-require('./routes/team')(app);
-require('./routes/experiment')(app);
+const usr = require('./routes/user')(app, config);
+require('./routes/team')(app, config);
+require('./routes/experiment')(app, config);
 
 // k8s stuff
 const kClient = require('kubernetes-client').Client;
@@ -72,12 +76,6 @@ async function configureKube() {
     }
 }
 
-async function get_user(id) {
-    var user = new ent.User();
-    user.id = id;
-    await user.get();
-    return user;
-}
 
 const requiresLogin = async (req, res, next) => {
     // to be used as middleware
@@ -109,7 +107,7 @@ const requiresLogin = async (req, res, next) => {
 // });
 
 app.get('/', async function (request, response) {
-    response.render("index")
+    response.render("index", request.session)
 });
 
 app.get('/about', async function (request, response) {
@@ -146,28 +144,6 @@ app.get('/login', (request, response) => {
     red = `${gConfig.AUTHORIZE_URI}?scope=urn%3Aglobus%3Aauth%3Ascope%3Aauth.globus.org%3Aview_identities+openid+email+profile&state=garbageString&redirect_uri=${gConfig.redirect_link}&response_type=code&client_id=${gConfig.CLIENT_ID}`;
     // console.log('redirecting to:', red);
     response.redirect(red);
-});
-
-app.get('/logout', function (req, res, next) {
-
-    if (req.session.loggedIn) {    // logout from Globus
-        let requestOptions = {
-            uri: `https://auth.globus.org/v2/web/logout?client_id=${gConfig.CLIENT_ID}`,
-            headers: {
-                Authorization: `Bearer ${req.session.token}`
-            },
-            json: true
-        };
-
-        request.get(requestOptions, function (error, response, body) {
-            if (error) {
-                console.log("logout failure...", error);
-            }
-            console.log("globus logout success.\n");
-        });
-    }
-    req.session.destroy();
-    res.render('index');
 });
 
 app.get('/authcallback', (req, res) => {
@@ -210,7 +186,7 @@ app.get('/authcallback', (req, res) => {
                 console.log('error on geting username:\t', error);
             }
             console.log('body:\t', body);
-            const user = new ent.User();
+            const user = new usr.User();
             user.id = req.session.user_id = body.sub;
             user.username = req.session.username = body.preferred_username;
             user.affiliation = req.session.organization = body.organization;
@@ -241,29 +217,10 @@ app.get('/authcallback', (req, res) => {
 
 });
 
-app.get('/reg', async function (req, res) {
-    req.session.loggedIn = true;
-    req.session.name = "Ilija";
-    req.session.username = "ilijav";
-    req.session.email = "Ilija@asdf";
-    req.session.affiliation = "University of Chicago";
-    req.session.teams = ['abc', 'ADC', 'loosers']
-    req.session.selected_team = 'ADC';
-    await
-        res.render("index");
-});
+
 
 app.get('/test', async function (req, res) {
     console.log('TEST starting...');
-    console.log('User...');
-    // create user
-    u = new ent.User();
-    u.name = "test user";
-    u.organization = "test organization";
-    u.username = "testUser";
-    u.email = "testUser@test.organization.org";
-    u.create();
-
     t = new ent.Team();
     t.name = "test team";
     t.desription = "test description";

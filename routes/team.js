@@ -1,6 +1,4 @@
-
-
-module.exports = function (app) {
+module.exports = function (app, config) {
 
     const ent = require('./../entities.js');
 

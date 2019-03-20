@@ -5,9 +5,16 @@
 Parameters:
    * Name
    * Email
-   * Project
+   * Project ?
+Returns userid
 * delete
+Parameters:
+   * userid
 * update
+Parameters:
+   * userid
+   * Name
+   * Email
 
 ### Experiment
 * create

@@ -91,32 +91,11 @@
 		$(".gtco-loader").fadeOut("slow");
 	};
 
-
-	var swapLoginLogout = function () { // this should be done with pug var.
-		$.get("/user", function (data) {
-			console.log(data);
-			if (data.name) {
-				console.log('hiding login button');
-				$('#login_button').hide();
-				$('#profile_button').show();
-				$('.requires_login').show();
-			} else {
-				console.log('hiding profile button');
-				$('#profile_button').hide();
-				$('#login_button').show();
-				$('.requires_login').hide();
-			}
-		});
-	};
-
 	$(function () {
 		dropdown();
 		tabs();
 		loaderPage();
-
-
 		dropdown();
-		swapLoginLogout();
 	});
 
 

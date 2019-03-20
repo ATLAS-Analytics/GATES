@@ -1,5 +1,7 @@
 {
     "SITENAME": "gates.mwt2.org",
     "NAMESPACE": "gates",
-    "STATIC_BASE_PATH": "web"
+    "STATIC_BASE_PATH": "web",
+    "ES_HOST": "atlas-kibana.mwt2.org:9200",
+    "ES_INDEX": "gates"
 }

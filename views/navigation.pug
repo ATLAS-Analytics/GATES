@@ -45,4 +45,9 @@ nav#mainNav.navbar.navbar-expand-lg.fixed-top(style='background-image: linear-gr
           li#profile_button.nav-item()
             a.nav-link(href='/profile') Profile
 
-
+        if (name)
+          li | #{name}
+        if (team)
+          li | #{team.name}
+        if (experiment)
+          li | #{experiment.name}

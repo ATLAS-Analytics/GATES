@@ -4,6 +4,15 @@ module.exports = function (app, config) {
     var elasticsearch = require('elasticsearch');
     var es = new elasticsearch.Client({ host: config.ES_HOST, log: 'error' });
 
+    var mg_config;
+    if (config.TESTING) {
+        mg_config = require('../kube/secrets/mg-config.json');
+    }
+    else {
+        mg_config = require('/etc/mg-conf/config.json');
+    }
+    var mg = require('mailgun-js')({ apiKey: mg_config.APPROVAL_MG, domain: mg_config.MG_DOMAIN });
+
     var module = {}
 
     // user can 
@@ -14,7 +23,7 @@ module.exports = function (app, config) {
 
     module.User = class User {
 
-        constructor(id = "XXX") {
+        constructor(id = null) {
             this.id = id;
             this.created_at = new Date().getTime();
         }
@@ -322,26 +331,29 @@ module.exports = function (app, config) {
         console.log('TESTING User...');
         console.log('fake login');
 
-        req.session.loggedIn = true;
-        req.session.user_id = "XXXUSERIDXXX";
-        req.session.name = "Ilija";
-        req.session.username = "ilijav";
-        req.session.email = "Ilija@asdf";
-        req.session.affiliation = "University of Chicago";
-        req.session.teams = {
-            'idabc': 'team_1', 'idbcd': 'team_2', 'idcab': 'team_3'
-        }
-        req.session.selected_team = 'idabc';
-
-        console.log("create user in ES");
         u = new module.User("XXXUSERIDXXX");
+
         u.name = "test user";
         u.organization = "test organization";
         u.username = "testUser";
         u.email = "testUser@test.organization.org";
+
+        req.session.loggedIn = true;
+        req.session.user_id = u.id;
+        req.session.name = u.name;
+        req.session.username = u.username;
+        req.session.email = u.email;
+        req.session.affiliation = u.organization;
+
+        req.session.teams = {
+            'idabc': 'team_1', 'idbcd': 'team_2', 'idcab': 'team_3'
+        }
+
+        console.log("create user in ES");
         u.print();
         if (!config.TESTING) {
             await u.create();
+            req.session.teams = await u.get_teams();
             await u.delete();
         }
         res.redirect("/");

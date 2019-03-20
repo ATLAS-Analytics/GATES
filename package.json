@@ -22,7 +22,6 @@
     },
     "homepage": "https://github.com/ATLAS-Analytics/GATES#readme",
     "dependencies": {
-        "body-parser": "^1.18.3",
         "cookies": "^0.7.3",
         "elasticsearch": "^15.4.1",
         "express": "^4.16.4",
@@ -31,7 +30,7 @@
         "https": "^1.0.0",
         "kubernetes-client": "^5.4.0",
         "mailgun-js": "^0.20.0",
-        "npm": "^6.8.0",
+        "npm": "^6.9.0",
         "pug": "^2.0.3",
         "request": "^2.88.0",
         "requests": "^0.2.2",

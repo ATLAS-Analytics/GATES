@@ -3,9 +3,8 @@ var express = require('express');
 var https = require('https');
 var http = require('http');
 var request = require('request');
-// const JSONStream = require('json-stream'); need for events only
 
-testing = true;
+testing = false;
 
 console.log('GATES server starting ... ');
 
@@ -34,8 +33,6 @@ else {
 var auth = "Basic " + new Buffer(gConfig.CLIENT_ID + ":" + gConfig.CLIENT_SECRET).toString("base64");
 
 console.log(config);
-
-const ent = require('./entities.js');
 
 var credentials = { key: privateKey, cert: certificate };
 
@@ -218,15 +215,6 @@ app.get('/authcallback', (req, res) => {
 });
 
 
-
-app.get('/test', async function (req, res) {
-    console.log('TEST starting...');
-    t = new ent.Team();
-    t.name = "test team";
-    t.desription = "test description";
-    t.create();
-    res.render("index");
-});
 
 // app.get('/authorize/:user_id', async function (req, res) {
 //     console.log('Authorizing user...');

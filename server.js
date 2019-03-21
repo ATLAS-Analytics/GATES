@@ -4,7 +4,7 @@ var https = require('https');
 var http = require('http');
 var request = require('request');
 
-testing = false;
+testing = true;
 
 console.log('GATES server starting ... ');
 

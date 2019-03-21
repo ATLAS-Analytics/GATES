@@ -134,13 +134,14 @@ module.exports = function (app, config) {
                     }
                 });
                 // console.log(resp);
-                var res = [];
+                var res = {};
                 if (resp.hits.total > 0) {
                     // console.log(resp.hits.hits);
                     for (var i = 0; i < resp.hits.hits.length; i++) {
                         var name = resp.hits.hits[i]._source.name;
                         var id = resp.hits.hits[i]._id;
-                        res.push({ id: name });
+                        console.log('team: ', id, name);
+                        res[id] = name;
                     }
                 } else {
                     console.log("no teams found.");

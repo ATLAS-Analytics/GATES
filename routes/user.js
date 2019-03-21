@@ -15,12 +15,6 @@ module.exports = function (app, config) {
 
     var module = {}
 
-    // user can 
-    // delete itself
-    // create team
-    // change team member list
-    // create/delete experiment ...
-
     module.User = class User {
 
         constructor(id = null) {
@@ -284,18 +278,22 @@ module.exports = function (app, config) {
 
     }
 
-    // // this one should not be needed?
-    // app.get('/user', function (req, res) {
-    //     console.log('sending profile info back (from session). ');
-    //     res.json({
-    //         loggedIn: req.session.loggedIn,
-    //         name: req.session.name,
-    //         email: req.session.email,
-    //         username: req.session.username,
-    //         organization: req.session.organization,
-    //         user_id: req.session.user_id
-    //     });
-    // });
+    app.get('/user', function (req, res) { // refresh
+        console.log('updating ...');
+
+        u = new module.User(req.session.user_id);
+        await u.get();
+        req.session.teams = await u.get_teams();
+        // res.json({
+        //     loggedIn: req.session.loggedIn,
+        //     name: req.session.name,
+        //     email: req.session.email,
+        //     username: req.session.username,
+        //     organization: req.session.organization,
+        //     user_id: req.session.user_id
+        // });
+        res.redirect("/");
+    });
 
     app.get('/logout', function (req, res, next) {
 

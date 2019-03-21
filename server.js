@@ -8,7 +8,6 @@ testing = false;
 
 console.log('GATES server starting ... ');
 
-console.log('config load ... ');
 var config;
 var privateKey;
 var certificate;

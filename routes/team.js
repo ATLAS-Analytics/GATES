@@ -142,6 +142,12 @@ module.exports = function (app, config) {
         res.render("team", req.session);
     });
 
+    app.get('/team/delete', function (req, res) {
+        console.log('deleting team:', req.session.team.id);
+        t = new module.Team(req.session.team.id);
+        await t.delete();
+        res.redirect("/user");
+    });
 
     app.get('/team/use/:team_id', function (req, res) {
         var team_id = req.params.team_id;
@@ -180,7 +186,7 @@ module.exports = function (app, config) {
         } else {
             team.create();
         }
-        res.redirect("/");
+        res.redirect("/user");
     });
 
     return module;

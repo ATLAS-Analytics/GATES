@@ -142,7 +142,7 @@ module.exports = function (app, config) {
         res.render("team", req.session);
     });
 
-    app.get('/team/delete', function (req, res) {
+    app.get('/team/delete', async function (req, res) {
         console.log('deleting team:', req.session.team.id);
         t = new module.Team(req.session.team.id);
         await t.delete();

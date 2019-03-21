@@ -278,7 +278,7 @@ module.exports = function (app, config) {
 
     }
 
-    app.get('/user', function (req, res) { // refresh
+    app.get('/user', async function (req, res) { // refresh
         console.log('updating ...');
 
         u = new module.User(req.session.user_id);

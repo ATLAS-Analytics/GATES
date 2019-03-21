@@ -184,7 +184,7 @@ module.exports = function (app, config) {
         if (req.session.team.id) {
             team.update();
         } else {
-            team.create();
+            team.create(req.session.user_id);
         }
         res.redirect("/user");
     });

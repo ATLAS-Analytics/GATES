@@ -138,9 +138,9 @@ module.exports = function (app, config) {
                 if (resp.hits.total > 0) {
                     // console.log(resp.hits.hits);
                     for (var i = 0; i < resp.hits.hits.length; i++) {
-                        var obj = resp.hits.hits[i]._source;
+                        var obj = resp.hits.hits[i];
                         console.log(obj);
-                        res.push(obj.name);
+                        res.push({ obj._id: obj._source.name });
                     }
                 } else {
                     console.log("no teams found.");

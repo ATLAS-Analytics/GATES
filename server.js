@@ -203,7 +203,7 @@ app.get('/authcallback', (req, res) => {
                 await user.get(); // so user.id gets filled up
             }
             req.session.loggedIn = true;
-            req.session.teams = user.get_teams();
+            req.session.teams = await user.get_teams();
             req.session.selected_team = null;
             req.session.selected_experiment = null;
             res.redirect("/");

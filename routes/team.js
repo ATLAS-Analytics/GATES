@@ -175,7 +175,12 @@ module.exports = function (app, config) {
         team.description = data.description;
         team.members = data.members;
         team.url = data.teamurl;
-        team.update();
+        if (req.session.team.id) {
+            team.update();
+        } else {
+            team.create();
+        }
+        res.redirect("/");
     });
 
     return module;

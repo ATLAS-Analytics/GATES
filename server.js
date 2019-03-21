@@ -4,7 +4,7 @@ var https = require('https');
 var http = require('http');
 var request = require('request');
 
-testing = false;
+testing = true;
 
 console.log('GATES server starting ... ');
 
@@ -108,7 +108,7 @@ app.get('/', async function (request, response) {
 });
 
 app.get('/about', async function (request, response) {
-    response.render("about")
+    response.render("about", request.session)
 });
 
 app.get('/healthz', function (request, response) {

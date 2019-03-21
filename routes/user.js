@@ -295,28 +295,6 @@ module.exports = function (app, config) {
         res.redirect("/");
     });
 
-    app.get('/logout', function (req, res, next) {
-
-        if (req.session.loggedIn) {    // logout from Globus
-            let requestOptions = {
-                uri: `https://auth.globus.org/v2/web/logout?client_id=${gConfig.CLIENT_ID}`,
-                headers: {
-                    Authorization: `Bearer ${req.session.token}`
-                },
-                json: true
-            };
-
-            request.get(requestOptions, function (error, response, body) {
-                if (error) {
-                    console.log("logout failure...", error);
-                }
-                console.log("globus logout success.\n");
-            });
-        }
-        req.session.destroy();
-        res.render('index');
-    });
-
     app.get('/user/delete', function (req, res) {
         console.log('deleting user:', req.session.user_id);
         u = new module.User(req.session.user_id);

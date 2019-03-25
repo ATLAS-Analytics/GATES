@@ -12,14 +12,11 @@ module.exports = function (app, config) {
         // delete team
         // update team - add members, change descriptions, change name
 
-        constructor(id = null) {
+        constructor() {
             this.name = 'Default team name';
             this.description = 'Default description';
             this.members = [];
             this.created_at = new Date().getTime();
-            if (id) {
-                this.get(id);
-            }
         }
 
         async create(user_id) {
@@ -34,6 +31,7 @@ module.exports = function (app, config) {
                         "name": this.name,
                         "description": this.description,
                         "members": this.members,
+                        "url": this.url,
                         "created_at": new Date().getTime()
                     }
                 });
@@ -68,11 +66,12 @@ module.exports = function (app, config) {
                 else {
                     console.log("team found.");
                     var obj = response.hits.hits[0]._source;
-                    // console.log(obj);
-                    this.id = obj._id;
+                    console.log(obj);
+                    this.id = response.hits.hits[0]._id;
                     this.name = obj.name;
                     this.description = obj.description;
                     this.members = obj.members;
+                    this.url = obj.url;
                     this.created_at = obj.created_at;
                     return true;
                 };
@@ -98,7 +97,7 @@ module.exports = function (app, config) {
         };
 
         async update() {
-            console.log("Updating team info in ES...");
+            console.log("Updating team info in ES. id: ", this.id);
             try {
                 const response = await es.update({
                     index: config.ES_INDEX, type: 'docs', id: this.id,
@@ -149,33 +148,35 @@ module.exports = function (app, config) {
         res.redirect("/user");
     });
 
-    app.get('/team/use/:team_id', function (req, res) {
+    app.get('/team/use/:team_id', async function (req, res) {
         var team_id = req.params.team_id;
         console.log("getting team ", team_id);
-        var team;
+        var team = new module.Team();;
         if (team_id === 'new') {
-            team = new module.Team();
+            console.log('creating new team.');
         } else {
-            team = new module.Team(team_id);
+            console.log('getting existing team.');
+            await team.get(team_id);
             req.session.team = {
                 id: team_id,
                 name: team.name,
+                description: team.description,
+                members: team.members.join(' '),
+                url: team.url,
                 experiments: team.experiments
             }
+            console.log(req.session.team);
         }
 
         res.render("team", req.session);
     });
 
-    app.post('/team/update', function (req, res) {
+    app.post('/team/update', async function (req, res) {
         var data = req.body;
         console.log("updating team:", data);
-        var team = null;
+        var team = new module.Team();
         if (req.session.team.id) {
-            //update
-            team = new module.Team(req.session.team.id);
-        } else {
-            team = new module.Team();
+            await team.get(req.session.team.id);
         }
         team.name = data.name;
         team.description = data.description;

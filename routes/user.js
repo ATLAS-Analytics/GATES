@@ -26,7 +26,7 @@ module.exports = function (app, config) {
             console.log("adding user to ES...");
             try {
                 const response = await es.index({
-                    index: config.ES_INDEX, type: 'docs',
+                    index: config.ES_INDEX, type: 'docs', id: this.id,
                     refresh: true,
                     body: {
                         "kind": "user",
@@ -117,7 +117,7 @@ module.exports = function (app, config) {
         };
 
         async get_teams() {
-            console.log('getting all teams of user...', this.username);
+            console.log('getting all teams of user...', this.id);
             try {
                 const resp = await es.search({
                     index: config.ES_INDEX, type: "docs",
@@ -322,17 +322,13 @@ module.exports = function (app, config) {
         req.session.email = u.email;
         req.session.affiliation = u.organization;
 
-        req.session.teams = {
-            'idabc': 'team_1', 'idbcd': 'team_2', 'idcab': 'team_3'
-        }
-
         console.log("create user in ES");
         u.print();
-        if (!config.TESTING) {
-            await u.create();
-            req.session.teams = await u.get_teams();
-            await u.delete();
-        }
+        // if (!config.TESTING) {
+        await u.create();
+        req.session.teams = await u.get_teams();
+        // await u.delete();
+        // }
         res.redirect("/");
     });
 

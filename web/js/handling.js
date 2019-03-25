@@ -48,7 +48,7 @@ $(document).ready(function () {
                 // $("#members_valid").text("At least one member is!").show();
                 // TODO - parse the text string. call to check if all usernames exist and give feedback if there are problems.
                 mems = $("#members").val();
-                mems = mems.toLowerCase();
+                // mems = mems.toLowerCase();
                 mems = mems.replace(" ", ";")
                 mems = mems.split(';');
             }

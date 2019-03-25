@@ -6,11 +6,6 @@ module.exports = function (app, config) {
     var module = {}
 
     module.Team = class Team {
-        // functions needed:
-        // create team - user can create a new team
-        // get team 
-        // delete team
-        // update team - add members, change descriptions, change name
 
         constructor() {
             this.name = 'Default team name';
@@ -116,6 +111,44 @@ module.exports = function (app, config) {
             }
             console.log("Done.");
         };
+
+        async get_experiments() {
+            console.log('getting all experiments of team:', this.id);
+            try {
+                const resp = await es.search({
+                    index: config.ES_INDEX, type: "docs",
+                    body: {
+                        query: {
+                            bool: {
+                                must: [
+                                    { match: { "kind": "experiment" } },
+                                    { match: { "team": this.id } },
+                                ]
+                            }
+                        },
+                        sort: { "created_at": { order: "desc" } }
+                    }
+                });
+                // console.log(resp);
+                var res = {};
+                if (resp.hits.total > 0) {
+                    // console.log(resp.hits.hits);
+                    for (var i = 0; i < resp.hits.hits.length; i++) {
+                        var name = resp.hits.hits[i]._source.name;
+                        var id = resp.hits.hits[i]._id;
+                        console.log('experiment: ', id, name);
+                        res[id] = name;
+                    }
+                } else {
+                    console.log("no experiments found.");
+                }
+                return res;
+            } catch (err) {
+                console.error(err)
+            }
+            return [];
+        };
+
     }
 
     app.get('/team/test', async function (req, res) {
@@ -143,14 +176,15 @@ module.exports = function (app, config) {
 
     app.get('/team/delete', async function (req, res) {
         console.log('deleting team:', req.session.team.id);
-        t = new module.Team(req.session.team.id);
+        t = new module.Team()
+        await t.get(req.session.team.id);
         await t.delete();
         res.redirect("/user");
     });
 
     app.get('/team/use/:team_id', async function (req, res) {
         var team_id = req.params.team_id;
-        console.log("getting team ", team_id);
+        console.log("getting team:", team_id);
         var team = new module.Team();;
         if (team_id === 'new') {
             console.log('creating new team.');
@@ -163,7 +197,7 @@ module.exports = function (app, config) {
                 description: team.description,
                 members: team.members.join(' '),
                 url: team.url,
-                experiments: team.experiments
+                experiments: team.get_experiments()
             }
             console.log(req.session.team);
         }

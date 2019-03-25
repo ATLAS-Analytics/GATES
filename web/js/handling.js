@@ -49,7 +49,7 @@ $(document).ready(function () {
                 // TODO - parse the text string. call to check if all usernames exist and give feedback if there are problems.
                 mems = $("#members").val();
                 // mems = mems.toLowerCase();
-                mems = mems.replace(" ", ";")
+                mems = mems.replace(" ", ";");
                 mems = mems.split(';');
             }
 
@@ -78,5 +78,49 @@ $(document).ready(function () {
         }
     )
 
+    $("#experiment_update").submit(
+        function (event) {
+
+            event.preventDefault();
+
+            console.log("experiment update called.");
+
+            $("#name_valid").text("").show();
+            $("#description_valid").text("").show();
+
+            data = {}
+            if ($("#name").val() === "") {
+                $("#name_valid").text("Name is mandatory!").show();
+                return;
+            }
+
+            if ($("#description").val() === "") {
+                $("#description_valid").text("Description is mandatory!").show();
+                return;
+            }
+
+            data['name'] = $("#name").val();
+            data['description'] = $("#description").val();
+            data['url'] = $("#exp_url").val();
+
+            // call REST API to create/update team. 
+            // can't this be done with simple $.post("/upsert_team",data??? ) 
+            var jqxhr = $.ajax({
+                type: 'post',
+                url: '/experiment/update',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (link) {
+                    alert('Experiment updated.');
+                    window.location.href = "/";
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    alert('Error code:' + xhr.status + '.  ' + xhr.responseText);
+                    window.location.href = "/";
+                }
+            });
+
+        }
+    )
 
 });

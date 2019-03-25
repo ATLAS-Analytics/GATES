@@ -8,30 +8,26 @@ html
             .container
                 .row
                     .col-lg-5.mx-auto
-                        h2 Team
+                        h2 Experiment
                         p.lead
                         | All team members have equal and full control 
                         | of all the experiments created by the team. 
                         | To add a member use his/her username. To check your user name, go to 
                         a(href='/profile') profile.
                     .col-lg-6.mx-auto
-                        h2 Create/Edit your Team
-                        form#team_update(action='#')
+                        h2 Create/Edit your Experiment
+                        form#experiment_update(action='#')
                             .form-group
                                 label(for='name') Name *
-                                input#name.form-control(type='text',required='',value=team.name)
+                                input#name.form-control(type='text',required='',value=experiment.name)
                                 p#name_valid
                             .form-group
                                 label(for='description') Description * 
-                                input#description.form-control(type='text',required='',value=team.description)
+                                input#description.form-control(type='text',required='',value=experiment.description)
                                 p#description_valid
                             .form-group
-                                label(for='members') Members * 
-                                input#members.form-control(type='text',required='',value=team.members)
-                                p#members_valid
-                            .form-group
-                                label(for='teamurl') Team web page/github repo.
-                                input#teamurl.form-control(type='text', value=team.url)
+                                label(for='teamurl') Experiment web page/github repo.
+                                input#exp_url.form-control(type='text', value=experiment.url)
                             .form-group
                                 input.btn.btn.btn-primary(type='submit', value='CREATE / SAVE')
 

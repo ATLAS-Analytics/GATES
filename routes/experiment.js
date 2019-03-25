@@ -9,12 +9,9 @@ module.exports = function (app, config) {
 
         // statuses: stopped, running, paused, retired
 
-        constructor(id = null) {
+        constructor(id) {
             this.created_at = new Date().getTime();
-            this.status = 'stopped'
-            if (id) {
-                this.get(id);
-            }
+            this.status = 'stopped';
         }
 
         async create(team_id) {
@@ -63,7 +60,7 @@ module.exports = function (app, config) {
                     console.log("experiment found.");
                     var obj = response.hits.hits[0]._source;
                     // console.log(obj);
-                    this.id = obj._id;
+                    this.id = response.hits.hits[0]._id;
                     this.name = obj.name;
                     this.description = obj.description;
                     this.team = obj.team;
@@ -114,19 +111,79 @@ module.exports = function (app, config) {
     }
 
     const usr = require('./user')(app, config);
-    app.get('/experiment', function (req, res) {
-        console.log('sending experiment info back.');
-        u = new usr.User(123);
-        u.print();
-        //     res.json({
-        //         loggedIn: req.session.loggedIn,
-        //         name: req.session.name,
-        //         email: req.session.email,
-        //         username: req.session.username,
-        //         organization: req.session.organization,
-        //         user_id: req.session.sub_id
-        //     });
+
+    app.get('/experiment/test', async function (req, res) {
+        console.log('EXPERIMENT team creation');
+        ex = new module.Experiment();
+        req.session.experiment = {}
+        req.session.experiment.id = 'XXXExperimentXXX';
+        req.session.experiment.name = ex.name;
+        req.session.experiment.url = 'http://best-team.team';
+        req.session.experiment.description = 'bla bla bla';
+        req.session.experiment.status = 'stopped';
+        if (!config.TESTING) {
+            await ex.create(req.session.team.team_id);
+            await ex.delete();
+        }
+        res.redirect("/");
     });
+
+    app.get('/experiment/new', function (req, res) {
+        console.log("new experiment ");
+        ex = new module.Experiment();
+        req.session.experiment = {};
+        res.render("experiment", req.session);
+    });
+
+    app.get('/experiment/delete', async function (req, res) {
+        console.log('deleting experiment:', req.session.experiment.id);
+        ex = new module.Team();
+        await ex.get(req.session.experiment.id);
+        await ex.delete();
+        res.redirect("/user");
+    });
+
+    app.get('/experiment/use/:exp_id', async function (req, res) {
+        var exp_id = req.params.exp_id;
+        console.log("getting experiment ", exp_id);
+        var ex = new module.Experiment();
+        if (exp_id === 'new') {
+            console.log('creating new experiment.');
+        } else {
+            console.log('getting existing experiment.');
+            await ex.get(exp_id);
+            req.session.experiment = {
+                id: exp_id,
+                name: ex.name,
+                description: ex.description,
+                status: ex.status,
+                url: ex.url
+            }
+            console.log(req.session.experiment);
+        }
+
+        res.render("experiment", req.session);
+    });
+
+    app.post('/experiment/update', async function (req, res) {
+        var data = req.body;
+        console.log("updating experiment:", data);
+        var ex = new module.Experiment();
+        if (req.session.experiment.id) {
+            await ex.get(req.session.experiment.id);
+        }
+        ex.name = data.name;
+        ex.description = data.description;
+        ex.status = data.status;
+        ex.url = data.url;
+        if (req.session.experiment.id) {
+            ex.update();
+        } else {
+            ex.create(req.session.team.id);
+        }
+        res.redirect("/user");
+    });
+
 
 
     return module;

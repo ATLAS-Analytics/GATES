@@ -38,7 +38,6 @@ module.exports = function (app, config) {
         };
 
         async get(id) {
-            console.log("getting team's info...");
             try {
                 const response = await es.search({
                     index: config.ES_INDEX, type: 'docs',
@@ -61,7 +60,7 @@ module.exports = function (app, config) {
                 else {
                     console.log("team found.");
                     var obj = response.hits.hits[0]._source;
-                    console.log(obj);
+                    // console.log(obj);
                     this.id = response.hits.hits[0]._id;
                     this.name = obj.name;
                     this.description = obj.description;
@@ -82,6 +81,7 @@ module.exports = function (app, config) {
             try {
                 const response = await es.deleteByQuery({
                     index: config.ES_INDEX, type: 'docs',
+                    refresh: true,
                     body: { query: { match: { "_id": this.id } } }
                 });
                 console.log(response);
@@ -96,6 +96,7 @@ module.exports = function (app, config) {
             try {
                 const response = await es.update({
                     index: config.ES_INDEX, type: 'docs', id: this.id,
+                    refresh: true,
                     body: {
                         doc: {
                             "name": this.name,
@@ -177,26 +178,27 @@ module.exports = function (app, config) {
     app.get('/team/delete', async function (req, res) {
         console.log('deleting team:', req.session.team.id);
         t = new module.Team()
-        await t.get(req.session.team.id);
+        t.id = req.session.team.id;
         await t.delete();
-        res.redirect("/");
+        req.session.team = {};
+        res.status(200).send('OK');
     });
 
-    app.get('/team/use/:team_id', async function (req, res) {
-        var team_id = req.params.team_id;
-        console.log("-------------");
-        console.log("getting team:", team_id);
+    app.get('/team/use/:id', async function (req, res) {
+        var id = req.params.id;
+        console.log("------------- getting team:", id, '--------------');
         var team = new module.Team();
-        await team.get(team_id);
+        await team.get(id);
         var exps = await team.get_experiments();
         req.session.team = {
-            id: team_id,
+            id: id,
             name: team.name,
             description: team.description,
             members: team.members.join(' '),
             url: team.url,
             experiments: exps
         }
+        req.session.experiment = {}
         console.log(req.session.team);
         console.log('----------------------');
 
@@ -215,11 +217,11 @@ module.exports = function (app, config) {
         team.members = data.members;
         team.url = data.teamurl;
         if (req.session.team.id) {
-            team.update();
+            await team.update();
         } else {
-            team.create(req.session.user_id);
+            await team.create(req.session.user_id);
         }
-        res.redirect("/");
+        res.status(200).send('OK');
     });
 
     return module;

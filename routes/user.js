@@ -88,6 +88,7 @@ module.exports = function (app, config) {
             try {
                 const response = await es.deleteByQuery({
                     index: config.ES_INDEX, type: 'docs',
+                    refresh: true,
                     body: { query: { match: { "_id": this.id } } }
                 });
                 console.log(response);
@@ -169,12 +170,12 @@ module.exports = function (app, config) {
 
     }
 
-    app.get('/user/delete', function (req, res) {
+    app.get('/user/delete', async function (req, res) {
         console.log('deleting user:', req.session.user_id);
         u = new module.User(req.session.user_id);
-        u.delete();
+        await u.delete();
         req.session.destroy();
-        res.redirect("/");
+        res.status(200).send('OK');
     });
 
     app.get('/user/test', async function (req, res) {

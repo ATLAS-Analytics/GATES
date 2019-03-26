@@ -1,3 +1,10 @@
+hr
+- var fo="| "
+- if (name) fo+=name;
+- if (team) fo+=" > "+team.name;
+- if (experiment) if (experiment.name) fo+=" > "+experiment.name;
+  p #{fo} 
+hr  
 footer.py-7.bg-light
   .container
     .col-md-12.mx-auto

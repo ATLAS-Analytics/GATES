@@ -21,7 +21,7 @@ html
                         else
                             - var butt='CREATE'
                             h2 Create Team
-                        form#team_update(action='#')
+                        form#team_update
                             .form-group
                                 label(for='name') Name *
                                 input#name.form-control(type='text',required='',value=team.name)
@@ -38,9 +38,10 @@ html
                                 label(for='teamurl') Team web page/github repo.
                                 input#teamurl.form-control(type='text', value=team.url)
                             .form-group
-                                input.btn.btn.btn-primary(type='submit', value=butt)
+                                button#team_update_button.btn.btn-primary #{butt}  
+                                if team.id
+                                    button#team_delete_button.btn.btn-primary Delete  
 
-        hr
         include ./footer.pug
 
         script(src='/js/main.js')

@@ -31,9 +31,11 @@ html
                                 label(for='exp_url') Experiment web page/github repo.
                                 input#teamurl.form-control(type='text', value=experiment.url)
                             .form-group
-                                input.btn.btn.btn-primary(type='submit', value=butt)
+                                button#experiment_update_button.btn.btn-primary #{butt} 
+                                if experiment.id
+                                    button#experiment_delete_button.btn.btn-primary Delete  
 
-        hr
+        
         include ./footer.pug
 
         script(src='/js/main.js')

@@ -9,7 +9,7 @@ module.exports = function (app, config) {
 
         // statuses: stopped, running, paused, retired
 
-        constructor(id) {
+        constructor() {
             this.created_at = new Date().getTime();
             this.status = 'stopped';
         }
@@ -80,6 +80,7 @@ module.exports = function (app, config) {
             try {
                 const response = await es.deleteByQuery({
                     index: config.ES_INDEX, type: 'docs',
+                    refresh: true,
                     body: { query: { match: { "_id": this.id } } }
                 });
                 console.log(response);
@@ -94,6 +95,7 @@ module.exports = function (app, config) {
             try {
                 const response = await es.update({
                     index: config.ES_INDEX, type: 'docs', id: this.id,
+                    refresh: true,
                     body: {
                         doc: {
                             "name": this.name,
@@ -137,10 +139,11 @@ module.exports = function (app, config) {
 
     app.get('/experiment/delete', async function (req, res) {
         console.log('deleting experiment:', req.session.experiment.id);
-        ex = new module.Team();
-        await ex.get(req.session.experiment.id);
+        ex = new module.Experiment();
+        ex.id = req.session.experiment.id;
         await ex.delete();
-        res.redirect("/");
+        req.session.experiment = {};
+        res.status(200).send('OK');
     });
 
     app.get('/experiment/use/:exp_id', async function (req, res) {
@@ -177,14 +180,12 @@ module.exports = function (app, config) {
         ex.status = data.status;
         ex.url = data.url;
         if (req.session.experiment.id) {
-            ex.update();
+            await ex.update();
         } else {
-            ex.create(req.session.team.id);
+            await ex.create(req.session.team.id);
         }
-        res.redirect("/");
+        res.status(200).send('OK');
     });
-
-
 
     return module;
 }

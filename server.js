@@ -103,21 +103,22 @@ const requiresLogin = async (req, res, next) => {
 // });
 
 app.get('/', async function (request, response) {
-    console.log("/ CALL");
-    console.log(request.session);
+    console.log("===========> / CALL");
+    // console.log(request.session);
     if (request.session.user_id) {
         u = new usr.User(request.session.user_id);
-        console.log("refresh user info...");
+        console.log("=====> refresh user info...");
         await u.get();
-        console.log("refresh teams list...");
+        console.log("=====> refresh teams list...");
         request.session.teams = await u.get_teams();
         if (request.session.team) {
-            console.log('refreshing experiments list...');
+            console.log('=====> refresh experiments list...');
             t = new tea.Team();
             t.id = request.session.team.id;
-            request.session.experiments = await t.get_experiments();
+            request.session.team.experiments = await t.get_experiments();
         }
     }
+    console.log("===========> / DONE");
     response.render("index", request.session)
 });
 

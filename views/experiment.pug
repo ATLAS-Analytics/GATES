@@ -4,36 +4,39 @@ html
     body
         include ./navigation.pug
 
-        section#gtco-header.gtco-cover.gtco-cover-xs.gtco-inner(style='background-color: rgba(52, 58, 64, 0.4)')
-            .gtco-container.container
+        section#gtco-header.bg-light
+            .container
                 .row
                     .col-lg-5.mx-auto
+                        h2 Experiment
                         p.lead
-                        img(src='images/cube.png')
-                    .col-lg-4.mx-auto
-                        .card(style='width: 18rem;')
-                        .card-body
-                        h4.card-title Profile Information
-                        div
-                        | Name:
-                        p#name.card-text #{name}
-                        div
-                        | Email:
-                        p#email.card-text #{email}
-                        div
-                        | Organization:
-                        p#affiliation.card-text #{affiliation}
-                        hr
-                        button#logout_button.btn.btn-primary Logout
+                        | Define your experiment.
+                    .col-lg-6.mx-auto
+                        if experiment.id
+                            - var butt='UPDATE'
+                            h2 Edit Experiment
+                        else
+                            - var butt='CREATE'
+                            h2 Create Experiment
+                        form#experiment_update(action='#')
+                            .form-group
+                                label(for='name') Name *
+                                input#name.form-control(type='text',required='',value=experiment.name)
+                                p#name_valid
+                            .form-group
+                                label(for='description') Description * 
+                                input#description.form-control(type='text',required='',value=experiment.description)
+                                p#description_valid
+                            .form-group
+                                label(for='exp_url') Experiment web page/github repo.
+                                input#teamurl.form-control(type='text', value=experiment.url)
+                            .form-group
+                                input.btn.btn.btn-primary(type='submit', value=butt)
 
         hr
         include ./footer.pug
 
-        script(src='js/main.js')
+        script(src='/js/main.js')
+        script(src='/js/handling.js')
 
-        //- script(type='text/javascript', language='JavaScript').
-        //-     $.get("/user", function (data) {
-        //-         $('#name').text(data.name);
-        //-         $('#email').text(data.email);
-        //-         $('#affiliation').text(data.organization);
-        //-     });
+

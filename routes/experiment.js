@@ -18,7 +18,7 @@ module.exports = function (app, config) {
             console.log("adding experiment to ES...");
             try {
                 const response = await es.index({
-                    index: index_name, type: 'docs',
+                    index: config.ES_INDEX, type: 'docs',
                     refresh: true,
                     body: {
                         "kind": "experiment",
@@ -40,7 +40,7 @@ module.exports = function (app, config) {
             console.log("getting experiment's info...");
             try {
                 const response = await es.search({
-                    index: index_name, type: 'docs',
+                    index: config.ES_INDEX, type: 'docs',
                     body: {
                         query: {
                             bool: {
@@ -79,7 +79,7 @@ module.exports = function (app, config) {
             console.log("deleting experiment from ES...");
             try {
                 const response = await es.deleteByQuery({
-                    index: index_name, type: 'docs',
+                    index: config.ES_INDEX, type: 'docs',
                     body: { query: { match: { "_id": this.id } } }
                 });
                 console.log(response);
@@ -93,7 +93,7 @@ module.exports = function (app, config) {
             console.log("Updating experiment info in ES...");
             try {
                 const response = await es.update({
-                    index: index_name, type: 'docs', id: this.id,
+                    index: config.ES_INDEX, type: 'docs', id: this.id,
                     body: {
                         doc: {
                             "name": this.name,
@@ -129,7 +129,7 @@ module.exports = function (app, config) {
     });
 
     app.get('/experiment/new', function (req, res) {
-        console.log("new experiment ");
+        console.log("New experiment");
         ex = new module.Experiment();
         req.session.experiment = {};
         res.render("experiment", req.session);
@@ -140,17 +140,17 @@ module.exports = function (app, config) {
         ex = new module.Team();
         await ex.get(req.session.experiment.id);
         await ex.delete();
-        res.redirect("/user");
+        res.redirect("/");
     });
 
     app.get('/experiment/use/:exp_id', async function (req, res) {
         var exp_id = req.params.exp_id;
         console.log("getting experiment ", exp_id);
-        var ex = new module.Experiment();
         if (exp_id === 'new') {
-            console.log('creating new experiment.');
+            console.log('creating new experiment. ==> useless??');
         } else {
             console.log('getting existing experiment.');
+            var ex = new module.Experiment();
             await ex.get(exp_id);
             req.session.experiment = {
                 id: exp_id,
@@ -181,7 +181,7 @@ module.exports = function (app, config) {
         } else {
             ex.create(req.session.team.id);
         }
-        res.redirect("/user");
+        res.redirect("/");
     });
 
 

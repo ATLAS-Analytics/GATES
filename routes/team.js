@@ -168,7 +168,7 @@ module.exports = function (app, config) {
     });
 
     app.get('/team/new', function (req, res) {
-        console.log("new team ");
+        console.log("New team");
         team = new module.Team();
         req.session.team = {};
         res.render("team", req.session);
@@ -179,28 +179,26 @@ module.exports = function (app, config) {
         t = new module.Team()
         await t.get(req.session.team.id);
         await t.delete();
-        res.redirect("/user");
+        res.redirect("/");
     });
 
     app.get('/team/use/:team_id', async function (req, res) {
         var team_id = req.params.team_id;
+        console.log("-------------");
         console.log("getting team:", team_id);
-        var team = new module.Team();;
-        if (team_id === 'new') {
-            console.log('creating new team.');
-        } else {
-            console.log('getting existing team.');
-            await team.get(team_id);
-            req.session.team = {
-                id: team_id,
-                name: team.name,
-                description: team.description,
-                members: team.members.join(' '),
-                url: team.url,
-                experiments: team.get_experiments()
-            }
-            console.log(req.session.team);
+        var team = new module.Team();
+        await team.get(team_id);
+        var exps = await team.get_experiments();
+        req.session.team = {
+            id: team_id,
+            name: team.name,
+            description: team.description,
+            members: team.members.join(' '),
+            url: team.url,
+            experiments: exps
         }
+        console.log(req.session.team);
+        console.log('----------------------');
 
         res.render("team", req.session);
     });
@@ -221,7 +219,7 @@ module.exports = function (app, config) {
         } else {
             team.create(req.session.user_id);
         }
-        res.redirect("/user");
+        res.redirect("/");
     });
 
     return module;

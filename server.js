@@ -51,8 +51,8 @@ app.use(session({
 }));
 
 const usr = require('./routes/user')(app, config);
-require('./routes/team')(app, config);
-require('./routes/experiment')(app, config);
+const tea = require('./routes/team')(app, config);
+const exp = require('./routes/experiment')(app, config);
 
 // k8s stuff
 const kClient = require('kubernetes-client').Client;
@@ -103,6 +103,21 @@ const requiresLogin = async (req, res, next) => {
 // });
 
 app.get('/', async function (request, response) {
+    console.log("/ CALL");
+    console.log(request.session);
+    if (request.session.user_id) {
+        u = new usr.User(request.session.user_id);
+        console.log("refresh user info...");
+        await u.get();
+        console.log("refresh teams list...");
+        request.session.teams = await u.get_teams();
+        if (request.session.team) {
+            console.log('refreshing experiments list...');
+            t = new tea.Team();
+            t.id = request.session.team.id;
+            request.session.experiments = await t.get_experiments();
+        }
+    }
     response.render("index", request.session)
 });
 
@@ -117,23 +132,6 @@ app.get('/healthz', function (request, response) {
         console.log("something wrong", err);
     }
 });
-
-// app.get('/get_services_from_es/:servicetype', async function (req, res) {
-//     console.log(req.params);
-//     var servicetype = req.params.servicetype;
-//     console.log('user:', req.session.user_id, 'service:', servicetype);
-//     var user = await get_user(req.session.user_id);
-//     var services = await user.get_services(servicetype);
-//     console.log(services);
-//     res.status(200).send(services);
-// });
-
-
-
-// app.post('/spark', requiresLogin, sparkCreator, (req, res) => {
-//     console.log('Spark job created!');
-//     res.status(200).send("OK");
-// });
 
 app.get('/login', (request, response) => {
     console.log('Logging in');
@@ -234,13 +232,6 @@ app.get('/logout', function (req, res) {
     req.session.destroy();
     res.render('index');
 });
-
-// app.get('/authorize/:user_id', async function (req, res) {
-//     console.log('Authorizing user...');
-//     var user = await get_user(req.params.user_id);
-//     user.approve();
-//     res.redirect("/users.html");
-// });
 
 
 app.use((err, req, res, next) => {

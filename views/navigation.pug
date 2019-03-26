@@ -18,7 +18,7 @@ nav#mainNav.navbar.navbar-expand-lg.fixed-top(style='background-image: linear-gr
             a#navbarDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
               | Teams
             .dropdown-menu(aria-labelledby='navbarDropdown')
-              if (typeof(teams) !== 'undefined')
+              if teams
                 each val, index in teams
                   a#plugin_projects.dropdown-item(href="/team/use/" + index) #{val}
               .dropdown-divider
@@ -28,6 +28,10 @@ nav#mainNav.navbar.navbar-expand-lg.fixed-top(style='background-image: linear-gr
             a#navbarDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
               | Experiments
             .dropdown-menu(aria-labelledby='navbarDropdown')
+              if team
+                if team.experiments
+                  each val, index in team.experiments
+                    a#plugin_projects.dropdown-item(href="/experiment/use/" + index) #{val}
               .dropdown-divider
               a#plugin_experiments.dropdown-item( href='/experiment/new') New experiment
           

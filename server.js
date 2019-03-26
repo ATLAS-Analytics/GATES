@@ -4,7 +4,7 @@ var https = require('https');
 var http = require('http');
 var request = require('request');
 
-testing = false;
+testing = true;
 
 console.log('GATES server starting ... ');
 
@@ -104,7 +104,7 @@ const requiresLogin = async (req, res, next) => {
 
 app.get('/', async function (request, response) {
     console.log("===========> / CALL");
-    // console.log(request.session);
+    console.log(request.session);
     if (request.session.user_id) {
         u = new usr.User(request.session.user_id);
         console.log("=====> refresh user info...");
@@ -114,8 +114,10 @@ app.get('/', async function (request, response) {
         if (request.session.team) {
             console.log('=====> refresh experiments list...');
             t = new tea.Team();
-            t.id = request.session.team.id;
-            request.session.team.experiments = await t.get_experiments();
+            if (request.session.team.id) {
+                t.id = request.session.team.id;
+                request.session.team.experiments = await t.get_experiments();
+            }
         }
     }
     console.log("===========> / DONE");

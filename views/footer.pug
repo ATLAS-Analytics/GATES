@@ -1,7 +1,7 @@
 hr
 - var fo="| "
 - if (name) fo+=name;
-- if (team) fo+=" > "+team.name;
+- if (team) if (team.name) fo+=" > "+team.name;
 - if (experiment) if (experiment.name) fo+=" > "+experiment.name;
   p #{fo} 
 hr  

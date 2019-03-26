@@ -150,7 +150,78 @@ module.exports = function (app, config) {
             return [];
         };
 
+        async get_usernames() {
+            console.log('getting usernames of all team members:', this.id);
+            this.usernames = "";
+            console.log(this.members);
+            for (const uid of this.members) {
+                try {
+                    const resp = await es.search({
+                        index: config.ES_INDEX, type: "docs",
+                        body: {
+                            query: {
+                                bool: {
+                                    must: [
+                                        { match: { "kind": "user" } },
+                                        { match: { "_id": uid } },
+                                    ]
+                                }
+                            }
+                        }
+                    });
+                    // console.log(resp);
+                    if (resp.hits.total > 0) {
+                        // console.log(resp.hits.hits);
+                        var name = resp.hits.hits[0]._source.username;
+                        console.log(uid, 'username: ', name);
+                        this.usernames += " " + name;
+                    }
+                    else {
+                        console.log("user with that id not found.");
+                    }
+                } catch (err) {
+                    console.error(err)
+                }
+            };
+        };
+
+        async get_members(usernames) {
+            console.log('getting ids of all usernames of team:', this.id, usernames);
+            var res = [];
+            for (const un of usernames) {
+                console.log('checking username:', un);
+                try {
+                    const resp = await es.search({
+                        index: config.ES_INDEX, type: "docs",
+                        body: {
+                            query: {
+                                bool: {
+                                    must: [
+                                        { match: { "kind": "user" } },
+                                        { match: { "username": un } },
+                                    ]
+                                }
+                            }
+                        }
+                    });
+                    // console.log(resp);
+                    if (resp.hits.total > 0) {
+                        // console.log(resp.hits.hits);
+                        var member = resp.hits.hits[0]._id;
+                        console.log('user: ', member);
+                        res.push(member);
+                    }
+                    else {
+                        console.log("user with that username not found.");
+                    }
+                } catch (err) {
+                    console.error(err)
+                }
+            };
+            return res;
+        };
     }
+
 
     app.get('/team/test', async function (req, res) {
         console.log('TEST team creation');
@@ -190,11 +261,13 @@ module.exports = function (app, config) {
         var team = new module.Team();
         await team.get(id);
         var exps = await team.get_experiments();
+        await team.get_usernames();
         req.session.team = {
             id: id,
             name: team.name,
             description: team.description,
-            members: team.members.join(' '),
+            members: team.members,
+            usernames: team.usernames,
             url: team.url,
             experiments: exps
         }
@@ -214,7 +287,7 @@ module.exports = function (app, config) {
         }
         team.name = data.name;
         team.description = data.description;
-        team.members = data.members;
+        team.members = await team.get_members(data.members);
         team.url = data.teamurl;
         if (req.session.team.id) {
             await team.update();

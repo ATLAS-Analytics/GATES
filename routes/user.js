@@ -179,15 +179,42 @@ module.exports = function (app, config) {
     });
 
     app.get('/user/test', async function (req, res) {
-        console.log('TESTING User...');
-        console.log('fake login');
+        console.log('TESTING User0...');
 
-        u = new module.User("XXXUSERIDXXX");
+        u = new module.User("USER_ID_0");
 
-        u.name = "test user";
-        u.organization = "test organization";
-        u.username = "testUser";
-        u.email = "testUser@test.organization.org";
+        u.name = "test user 0";
+        u.username = "testUser_0";
+        u.organization = "test organization 0";
+        u.email = "testUser_0@test.organization.org";
+
+        req.session.loggedIn = true;
+        req.session.user_id = u.id;
+        req.session.name = u.name;
+        req.session.username = u.username;
+        req.session.email = u.email;
+        req.session.affiliation = u.organization;
+
+        console.log("create user in ES");
+        u.print();
+        // if (!config.TESTING) {
+        await u.create();
+        req.session.teams = await u.get_teams();
+        // await u.delete();
+        // }
+        res.redirect("/");
+    });
+
+    app.get('/user/test_1', async function (req, res) {
+        console.log('TESTING User1...');
+
+
+        u = new module.User("USER_ID_1");
+        u.name = "test user 1";
+        u.username = "testUser1";
+
+        u.organization = "test organization 1";
+        u.email = "testUser_1@test.organization.org";
 
         req.session.loggedIn = true;
         req.session.user_id = u.id;

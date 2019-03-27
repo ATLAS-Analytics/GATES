@@ -222,23 +222,6 @@ module.exports = function (app, config) {
         };
     }
 
-
-    app.get('/team/test', async function (req, res) {
-        console.log('TEST team creation');
-        t = new module.Team();
-        req.session.team = {}
-        req.session.team.team_id = 'asdf';
-        req.session.team.name = t.name;
-        req.session.team.url = 'http://best-team.team';
-        req.session.team.description = 'bla bla bla';
-        req.session.team.members = 'abc bca cba';
-        if (!config.TESTING) {
-            await t.create(req.session.user_id);
-            await t.delete();
-        }
-        res.redirect("/");
-    });
-
     app.get('/team/new', function (req, res) {
         console.log("New team");
         team = new module.Team();

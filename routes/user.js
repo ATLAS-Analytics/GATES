@@ -197,11 +197,8 @@ module.exports = function (app, config) {
 
         console.log("create user in ES");
         u.print();
-        // if (!config.TESTING) {
         await u.create();
         req.session.teams = await u.get_teams();
-        // await u.delete();
-        // }
         res.redirect("/");
     });
 

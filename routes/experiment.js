@@ -112,22 +112,14 @@ module.exports = function (app, config) {
         };
     }
 
-    const usr = require('./user')(app, config);
-
     app.get('/experiment/test', async function (req, res) {
-        console.log('EXPERIMENT team creation');
-        ex = new module.Experiment();
-        req.session.experiment = {}
-        req.session.experiment.id = 'XXXExperimentXXX';
-        req.session.experiment.name = ex.name;
-        req.session.experiment.url = 'http://best-team.team';
-        req.session.experiment.description = 'bla bla bla';
-        req.session.experiment.status = 'stopped';
-        if (!config.TESTING) {
-            await ex.create(req.session.team.team_id);
-            await ex.delete();
-        }
-        res.redirect("/");
+        console.log('TESTING Experiment UI...');
+        req.session.experiment = {};
+        req.session.experiment.id = 'Exp_id';
+        req.session.experiment.name = 'Experiment Name';
+        req.session.experiment.description = 'Experiment Description';
+        req.session.experiment.status = 'Running';
+        res.render("experiment", req.session);
     });
 
     app.get('/experiment/new', function (req, res) {

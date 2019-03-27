@@ -24,7 +24,7 @@
 
 	};
 
-	var tabs = function () {
+	var hmtabs = function () {
 
 		// Auto adjust height
 		$('.gtco-tab-content-wrap').css('height', 0);
@@ -92,8 +92,10 @@
 	};
 
 	$(function () {
+		$("#extabs").tabs();
+		$("#status").selectmenu();
 		dropdown();
-		tabs();
+		hmtabs();
 		loaderPage();
 		dropdown();
 	});
